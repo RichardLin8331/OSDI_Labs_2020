@@ -1,0 +1,115 @@
+#include "include/string.h"
+#include "include/uart.h"
+#include "include/reboot.h"
+#include "include/time.h"
+#include "include/mailbox_message.h"
+#include "include/load_kernel.h"
+
+int debug = 0;
+int parse_command(char* cmd) {
+    
+    if (debug == 1) {
+        char debug_msg[] = "Current Command: ";
+        string_concat(debug_msg, cmd);
+        uart_send_string(debug_msg);
+        uart_send_string("\r\n");
+    }
+    if (strcmp(cmd, "help") == 0) return 0;
+    else if (strcmp(cmd, "hello") == 0) return 1;
+    else if (strcmp(cmd, "reboot") == 0) return 2;
+    else if (strcmp(cmd, "timestamp") == 0) return 3;
+    else if (strcmp(cmd, "board_revision") == 0) return 4;
+    else if (strcmp(cmd, "vc_base") == 0) return 5;
+    else if (strcmp(cmd, "load_kernel") == 0) return 6;
+    return -1;
+}
+
+void execute_command(int cmd_num) {
+    switch (cmd_num) {
+        case 0:
+            uart_send_string("NYCU OSDI Lab1 Shell\r\n\n");
+            uart_send_string("Supported Commands: \r\n");
+            uart_send_string("help: print shell information\r\n");
+            uart_send_string("hello: print hello message\r\n");
+            uart_send_string("reboot: reboot the raspi3b board\r\n");
+            uart_send_string("timestamp: get current timestamp\r\n");
+            uart_send_string("board_revision: get board revision\r\n");
+            uart_send_string("vc_base: get VC core base address\r\n");
+            uart_send_string("load_kernel: start loading new kernel");
+
+        break;
+
+        case 1:
+            uart_send_string("Hello World!\r\n");
+
+        break;
+
+        case 2:
+            uart_send_string("Start Reboot\r\n");
+            reset(1000);
+        break;
+
+        case 3:
+            char ts_msg[] = "Timestamp is: ";
+            char ts[128];
+            float ts_float = get_timestamp();
+            ftos(ts_float, ts);
+            string_concat(ts_msg, ts);
+            string_concat(ts_msg, "\r\n");
+            uart_send_string(ts_msg);
+
+        break;
+        
+        case 4:
+            char bv_msg[] = "Board revision is: ";
+            char bv[] = "0x00000000";
+            get_board_revision(bv);
+            string_concat(bv_msg, bv);
+            string_concat(bv_msg, "\r\n");
+            uart_send_string(bv_msg);
+            
+        break;
+
+        case 5:
+            char vc_msg[] = "VC Core Base Address is: ";
+            char vc_base[] = "0x00000000";
+            get_vc_base(vc_base);
+            string_concat(vc_msg, vc_base);
+            string_concat(vc_msg, "\r\n");
+            uart_send_string(vc_msg);
+        
+        break;
+
+        case 6:
+            load_kernel();
+            
+        break;
+
+        case -1:
+            uart_send_string("Warning: Command Not Found");
+        break;
+    }
+}
+
+void shell_run() {
+    uart_send_string("# Shell Start Running\r\n");
+    while (1) {
+        char cmd[128];
+        char *cur_c = cmd;
+        uart_send_string("# ");
+        while (1){
+            char c = uart_get();
+            if (c != '\n') {
+                *cur_c++ = c;
+                uart_send(c);
+            } else {
+                uart_send_string("\r\n");
+                *cur_c++ = '\0';
+                execute_command(parse_command(cmd));
+                break;
+            }
+        }
+        uart_send_string("\r\n");
+    }
+}
+
