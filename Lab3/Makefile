@@ -45,7 +45,8 @@ $(BUILDDIR)/%_s.o: $(SRCDIR)/%.S
 clean:
 	rm -rf $(BUILDDIR) *.img
 run:
-	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio
-
+	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio 
+run-debug:
+	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio -d int,unimp -D qemu.log
 run-pty:
 	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial pty

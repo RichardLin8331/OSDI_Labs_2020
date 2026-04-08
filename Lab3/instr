@@ -1,0 +1,2703 @@
+
+build/kernel8.elf:	file format elf64-littleaarch64
+
+Disassembly of section .text.boot:
+
+0000000000080000 <_start>:
+   80000: a0 00 38 d5  	mrs	x0, MPIDR_EL1
+   80004: 00 04 40 92  	and	x0, x0, #0x3
+   80008: 60 00 00 b4  	cbz	x0, 0x80014 <el2_init>
+   8000c: 5f 20 03 d5  	wfe
+   80010: ff ff ff 17  	b	0x8000c <_start+0xc>
+
+0000000000080014 <el2_init>:
+   80014: 40 42 38 d5  	mrs	x0, CurrentEL
+   80018: 00 04 7e 92  	and	x0, x0, #0xc
+   8001c: 1f 30 00 f1  	cmp	x0, #12
+   80020: 01 01 00 54  	b.ne	0x80040 <el2_init+0x2c>
+   80024: 22 b6 80 d2  	mov	x2, #1457
+   80028: 02 11 1e d5  	msr	SCR_EL3, x2
+   8002c: 22 79 80 d2  	mov	x2, #969
+   80030: 02 40 1e d5  	msr	SPSR_EL3, x2
+   80034: 62 00 00 10  	adr	x2, #12
+   80038: 22 40 1e d5  	msr	ELR_EL3, x2
+   8003c: e0 03 9f d6  	eret
+   80040: 00 04 00 58  	ldr	x0, 0x800c0 <$d>
+   80044: 00 c0 1c d5  	msr	VBAR_EL2, x0
+   80048: 00 11 3c d5  	mrs	x0, HCR_EL2
+   8004c: 00 00 61 b2  	orr	x0, x0, #0x80000000
+   80050: 00 11 1c d5  	msr	HCR_EL2, x0
+   80054: a0 78 80 d2  	mov	x0, #965
+   80058: 00 40 1c d5  	msr	SPSR_EL2, x0
+   8005c: a0 00 00 10  	adr	x0, #20
+   80060: 20 40 1c d5  	msr	ELR_EL2, x0
+   80064: 00 04 a0 d2  	mov	x0, #2097152
+   80068: 00 41 1c d5  	msr	SP_EL1, x0
+   8006c: e0 03 9f d6  	eret
+
+0000000000080070 <el1_init>:
+   80070: 00 06 a0 d2  	mov	x0, #3145728
+   80074: 40 10 18 d5  	msr	CPACR_EL1, x0
+   80078: df 3f 03 d5  	isb
+   8007c: 20 02 00 58  	ldr	x0, 0x800c0 <$d>
+   80080: 00 c0 18 d5  	msr	VBAR_EL1, x0
+   80084: 20 02 00 58  	ldr	x0, 0x800c8 <$d+0x8>
+   80088: 41 02 00 58  	ldr	x1, 0x800d0 <$d+0x10>
+   8008c: 1f 00 01 eb  	cmp	x0, x1
+   80090: 6a 00 00 54  	b.ge	0x8009c <el1_init+0x2c>
+   80094: 1f 84 00 f8  	str	xzr, [x0], #8
+   80098: fd ff ff 17  	b	0x8008c <el1_init+0x1c>
+   8009c: 00 14 a0 d2  	mov	x0, #10485760
+   800a0: 00 41 18 d5  	msr	SP_EL0, x0
+   800a4: 00 00 80 d2  	mov	x0, #0
+   800a8: 00 40 18 d5  	msr	SPSR_EL1, x0
+   800ac: 60 00 00 10  	adr	x0, #12
+   800b0: 20 40 18 d5  	msr	ELR_EL1, x0
+   800b4: e0 03 9f d6  	eret
+
+00000000000800b8 <el0_init>:
+   800b8: d2 0b 00 94  	bl	0x83000 <main>
+   800bc: d4 ff ff 17  	b	0x8000c <_start+0xc>
+
+00000000000800c0 <$d>:
+   800c0:	00 28 08 00	.word	0x00082800
+   800c4:	00 00 00 00	.word	0x00000000
+   800c8:	aa 37 08 00	.word	0x000837aa
+   800cc:	00 00 00 00	.word	0x00000000
+   800d0:	44 38 08 00	.word	0x00083844
+   800d4:	00 00 00 00	.word	0x00000000
+
+Disassembly of section .text:
+
+0000000000080800 <exception_handler>:
+   80800: 00 00 00 f0  	adrp	x0, 0x83000 <exception_handler+0xc>
+   80804: 00 c0 00 91  	add	x0, x0, #48
+   80808: 02 04 00 14  	b	0x81810 <uart_send_string>
+   8080c: 1f 20 03 d5  	nop
+
+0000000000080810 <sp_exception_handler>:
+   80810: fd 7b b5 a9  	stp	x29, x30, [sp, #-176]!
+   80814: 00 00 00 f0  	adrp	x0, 0x83000 <sp_exception_handler+0x10>
+   80818: 00 00 01 91  	add	x0, x0, #64
+   8081c: fd 03 00 91  	mov	x29, sp
+   80820: f3 53 01 a9  	stp	x19, x20, [sp, #16]
+   80824: f5 5b 02 a9  	stp	x21, x22, [sp, #32]
+   80828: f7 63 03 a9  	stp	x23, x24, [sp, #48]
+   8082c: f9 6b 04 a9  	stp	x25, x26, [sp, #64]
+   80830: f8 03 00 94  	bl	0x81810 <uart_send_string>
+   80834: 40 42 38 d5  	mrs	x0, CurrentEL
+   80838: 02 00 00 f0  	adrp	x2, 0x83000 <sp_exception_handler+0x34>
+   8083c: 42 a0 01 91  	add	x2, x2, #104
+   80840: f3 83 01 91  	add	x19, sp, #96
+   80844: 00 0c 42 d3  	ubfx	x0, x0, #2, #2
+   80848: e1 03 13 aa  	mov	x1, x19
+   8084c: 58 00 40 f9  	ldr	x24, [x2]
+   80850: f8 33 00 f9  	str	x24, [sp, #96]
+   80854: 57 70 40 b8  	ldur	w23, [x2, #7]
+   80858: f7 73 06 b8  	stur	w23, [sp, #103]
+   8085c: 25 03 00 94  	bl	0x814f0 <htos>
+   80860: 00 00 00 f0  	adrp	x0, 0x83000 <sp_exception_handler+0x5c>
+   80864: 00 60 01 91  	add	x0, x0, #88
+   80868: ea 03 00 94  	bl	0x81810 <uart_send_string>
+   8086c: e0 03 13 aa  	mov	x0, x19
+   80870: 13 00 00 f0  	adrp	x19, 0x83000 <sp_exception_handler+0x6c>
+   80874: e7 03 00 94  	bl	0x81810 <uart_send_string>
+   80878: 73 42 0d 91  	add	x19, x19, #848
+   8087c: e0 03 13 aa  	mov	x0, x19
+   80880: e4 03 00 94  	bl	0x81810 <uart_send_string>
+   80884: 20 40 38 d5  	mrs	x0, ELR_EL1
+   80888: 19 52 38 d5  	mrs	x25, ESR_EL1
+   8088c: f6 c3 01 91  	add	x22, sp, #112
+   80890: f8 3b 00 f9  	str	x24, [sp, #112]
+   80894: f8 43 00 f9  	str	x24, [sp, #128]
+   80898: f5 03 02 91  	add	x21, sp, #128
+   8089c: f8 4b 00 f9  	str	x24, [sp, #144]
+   808a0: e1 03 16 aa  	mov	x1, x22
+   808a4: f7 73 07 b8  	stur	w23, [sp, #119]
+   808a8: f4 43 02 91  	add	x20, sp, #144
+   808ac: f7 73 08 b8  	stur	w23, [sp, #135]
+   808b0: fa 83 02 91  	add	x26, sp, #160
+   808b4: f7 73 09 b8  	stur	w23, [sp, #151]
+   808b8: 0e 03 00 94  	bl	0x814f0 <htos>
+   808bc: e1 03 15 aa  	mov	x1, x21
+   808c0: 20 7f 1a 53  	lsr	w0, w25, #26
+   808c4: 0b 03 00 94  	bl	0x814f0 <htos>
+   808c8: f8 43 01 91  	add	x24, sp, #80
+   808cc: e1 03 14 aa  	mov	x1, x20
+   808d0: 20 5f 40 92  	and	x0, x25, #0xffffff
+   808d4: 07 03 00 94  	bl	0x814f0 <htos>
+   808d8: 02 00 00 f0  	adrp	x2, 0x83000 <sp_exception_handler+0xd4>
+   808dc: 42 e0 01 91  	add	x2, x2, #120
+   808e0: e1 03 16 aa  	mov	x1, x22
+   808e4: e0 03 1a aa  	mov	x0, x26
+   808e8: f6 63 01 91  	add	x22, sp, #88
+   808ec: 43 00 40 f9  	ldr	x3, [x2]
+   808f0: e3 53 00 f9  	str	x3, [sp, #160]
+   808f4: 42 08 40 b9  	ldr	w2, [x2, #8]
+   808f8: e2 ab 00 b9  	str	w2, [sp, #168]
+   808fc: 6d 02 00 94  	bl	0x812b0 <string_concat>
+   80900: e0 03 1a aa  	mov	x0, x26
+   80904: c3 03 00 94  	bl	0x81810 <uart_send_string>
+   80908: e0 03 13 aa  	mov	x0, x19
+   8090c: c1 03 00 94  	bl	0x81810 <uart_send_string>
+   80910: 02 00 00 f0  	adrp	x2, 0x83000 <sp_exception_handler+0x10c>
+   80914: 42 20 02 91  	add	x2, x2, #136
+   80918: e1 03 15 aa  	mov	x1, x21
+   8091c: e0 03 18 aa  	mov	x0, x24
+   80920: 43 00 40 b9  	ldr	w3, [x2]
+   80924: 42 30 40 b8  	ldur	w2, [x2, #3]
+   80928: e3 53 00 b9  	str	w3, [sp, #80]
+   8092c: e2 33 05 b8  	stur	w2, [sp, #83]
+   80930: 60 02 00 94  	bl	0x812b0 <string_concat>
+   80934: e0 03 18 aa  	mov	x0, x24
+   80938: b6 03 00 94  	bl	0x81810 <uart_send_string>
+   8093c: e0 03 13 aa  	mov	x0, x19
+   80940: b4 03 00 94  	bl	0x81810 <uart_send_string>
+   80944: 22 69 8a d2  	mov	x2, #21321
+   80948: e1 03 14 aa  	mov	x1, x20
+   8094c: 62 0a a4 f2  	movk	x2, #8275, lsl #16
+   80950: e0 03 16 aa  	mov	x0, x22
+   80954: 22 6d ce f2  	movk	x2, #29545, lsl #32
+   80958: 02 04 e0 f2  	movk	x2, #32, lsl #48
+   8095c: e2 2f 00 f9  	str	x2, [sp, #88]
+   80960: 54 02 00 94  	bl	0x812b0 <string_concat>
+   80964: e0 03 16 aa  	mov	x0, x22
+   80968: aa 03 00 94  	bl	0x81810 <uart_send_string>
+   8096c: e0 03 13 aa  	mov	x0, x19
+   80970: a8 03 00 94  	bl	0x81810 <uart_send_string>
+   80974: f3 53 41 a9  	ldp	x19, x20, [sp, #16]
+   80978: f5 5b 42 a9  	ldp	x21, x22, [sp, #32]
+   8097c: f7 63 43 a9  	ldp	x23, x24, [sp, #48]
+   80980: f9 6b 44 a9  	ldp	x25, x26, [sp, #64]
+   80984: fd 7b cb a8  	ldp	x29, x30, [sp], #176
+   80988: c0 03 5f d6  	ret
+   8098c: 1f 20 03 d5  	nop
+
+0000000000080990 <hello_handler>:
+   80990: 00 00 00 f0  	adrp	x0, 0x83000 <hello_handler+0xc>
+   80994: 00 40 02 91  	add	x0, x0, #144
+   80998: 9e 03 00 14  	b	0x81810 <uart_send_string>
+   8099c: 00 00 00 00  	udf	#0
+
+00000000000809a0 <load_kernel>:
+   809a0: fd 7b b9 a9  	stp	x29, x30, [sp, #-112]!
+   809a4: fd 03 00 91  	mov	x29, sp
+   809a8: f3 53 01 a9  	stp	x19, x20, [sp, #16]
+   809ac: f5 5b 02 a9  	stp	x21, x22, [sp, #32]
+   809b0: f7 1b 00 f9  	str	x23, [sp, #48]
+   809b4: 02 00 00 14  	b	0x809bc <load_kernel+0x1c>
+   809b8: 7a 03 00 94  	bl	0x817a0 <uart_send>
+   809bc: 85 03 00 94  	bl	0x817d0 <uart_get>
+   809c0: 01 1c 00 12  	and	w1, w0, #0xff
+   809c4: a0 08 80 52  	mov	w0, #69
+   809c8: 3f 84 01 71  	cmp	w1, #97
+   809cc: 61 ff ff 54  	b.ne	0x809b8 <load_kernel+0x18>
+   809d0: 20 08 80 52  	mov	w0, #65
+   809d4: 73 03 00 94  	bl	0x817a0 <uart_send>
+   809d8: f7 23 01 91  	add	x23, sp, #72
+   809dc: f6 63 01 91  	add	x22, sp, #88
+   809e0: 7c 03 00 94  	bl	0x817d0 <uart_get>
+   809e4: 14 1c 40 92  	and	x20, x0, #0xff
+   809e8: 7a 03 00 94  	bl	0x817d0 <uart_get>
+   809ec: 13 1c 00 12  	and	w19, w0, #0xff
+   809f0: 78 03 00 94  	bl	0x817d0 <uart_get>
+   809f4: 15 1c 00 12  	and	w21, w0, #0xff
+   809f8: 76 03 00 94  	bl	0x817d0 <uart_get>
+   809fc: e2 03 00 2a  	mov	w2, w0
+   80a00: b5 3e 10 53  	lsl	w21, w21, #16
+   80a04: 60 08 80 52  	mov	w0, #67
+   80a08: 42 1c 08 53  	lsl	w2, w2, #24
+   80a0c: b5 22 13 2a  	orr	w21, w21, w19, lsl #8
+   80a10: 42 7c 40 93  	sxtw	x2, w2
+   80a14: b5 7e 40 93  	sxtw	x21, w21
+   80a18: 42 00 14 aa  	orr	x2, x2, x20
+   80a1c: b5 02 02 aa  	orr	x21, x21, x2
+   80a20: 60 03 00 94  	bl	0x817a0 <uart_send>
+   80a24: 02 00 00 f0  	adrp	x2, 0x83000 <load_kernel+0x90>
+   80a28: 42 a0 01 91  	add	x2, x2, #104
+   80a2c: e0 03 15 2a  	mov	w0, w21
+   80a30: e1 03 17 aa  	mov	x1, x23
+   80a34: 43 00 40 f9  	ldr	x3, [x2]
+   80a38: e3 27 00 f9  	str	x3, [sp, #72]
+   80a3c: 42 70 40 b8  	ldur	w2, [x2, #7]
+   80a40: e2 f3 04 b8  	stur	w2, [sp, #79]
+   80a44: ab 02 00 94  	bl	0x814f0 <htos>
+   80a48: 02 00 00 f0  	adrp	x2, 0x83000 <load_kernel+0xb4>
+   80a4c: 42 00 04 91  	add	x2, x2, #256
+   80a50: e1 03 17 aa  	mov	x1, x23
+   80a54: e0 03 16 aa  	mov	x0, x22
+   80a58: 44 14 40 a9  	ldp	x4, x5, [x2]
+   80a5c: e4 97 05 a9  	stp	x4, x5, [sp, #88]
+   80a60: 42 20 40 79  	ldrh	w2, [x2, #16]
+   80a64: e2 d3 00 79  	strh	w2, [sp, #104]
+   80a68: 12 02 00 94  	bl	0x812b0 <string_concat>
+   80a6c: e0 03 16 aa  	mov	x0, x22
+   80a70: 68 03 00 94  	bl	0x81810 <uart_send_string>
+   80a74: 1f 20 03 d5  	nop
+   80a78: 56 03 00 94  	bl	0x817d0 <uart_get>
+   80a7c: 13 1c 00 12  	and	w19, w0, #0xff
+   80a80: 7f 2a 00 71  	cmp	w19, #10
+   80a84: a0 ff ff 54  	b.eq	0x80a78 <load_kernel+0xd8>
+   80a88: 7f ce 01 71  	cmp	w19, #115
+   80a8c: 20 01 00 54  	b.eq	0x80ab0 <load_kernel+0x110>
+   80a90: a0 08 80 52  	mov	w0, #69
+   80a94: 43 03 00 94  	bl	0x817a0 <uart_send>
+   80a98: e0 03 13 2a  	mov	w0, w19
+   80a9c: 41 03 00 94  	bl	0x817a0 <uart_send>
+   80aa0: 4c 03 00 94  	bl	0x817d0 <uart_get>
+   80aa4: 13 1c 00 12  	and	w19, w0, #0xff
+   80aa8: 7f ce 01 71  	cmp	w19, #115
+   80aac: 21 ff ff 54  	b.ne	0x80a90 <load_kernel+0xf0>
+   80ab0: 40 0a 80 52  	mov	w0, #82
+   80ab4: 3b 03 00 94  	bl	0x817a0 <uart_send>
+   80ab8: f3 03 15 aa  	mov	x19, x21
+   80abc: 45 03 00 94  	bl	0x817d0 <uart_get>
+   80ac0: 16 1c 00 12  	and	w22, w0, #0xff
+   80ac4: 43 03 00 94  	bl	0x817d0 <uart_get>
+   80ac8: 14 1c 00 12  	and	w20, w0, #0xff
+   80acc: 41 03 00 94  	bl	0x817d0 <uart_get>
+   80ad0: 00 1c 10 53  	ubfiz	w0, w0, #16, #8
+   80ad4: 14 20 14 2a  	orr	w20, w0, w20, lsl #8
+   80ad8: 3e 03 00 94  	bl	0x817d0 <uart_get>
+   80adc: e1 03 00 2a  	mov	w1, w0
+   80ae0: 60 08 80 52  	mov	w0, #67
+   80ae4: c1 62 01 2a  	orr	w1, w22, w1, lsl #24
+   80ae8: 94 02 01 2a  	orr	w20, w20, w1
+   80aec: 2d 03 00 94  	bl	0x817a0 <uart_send>
+   80af0: 54 01 00 34  	cbz	w20, 0x80b18 <load_kernel+0x178>
+   80af4: 94 06 00 51  	sub	w20, w20, #1
+   80af8: a0 06 00 91  	add	x0, x21, #1
+   80afc: 94 02 00 8b  	add	x20, x20, x0
+   80b00: f6 03 13 aa  	mov	x22, x19
+   80b04: 33 03 00 94  	bl	0x817d0 <uart_get>
+   80b08: 73 06 00 91  	add	x19, x19, #1
+   80b0c: c0 02 00 39  	strb	w0, [x22]
+   80b10: 9f 02 13 eb  	cmp	x20, x19
+   80b14: 61 ff ff 54  	b.ne	0x80b00 <load_kernel+0x160>
+   80b18: 00 00 00 f0  	adrp	x0, 0x83000 <load_kernel+0x184>
+   80b1c: 00 80 03 91  	add	x0, x0, #224
+   80b20: 3c 03 00 94  	bl	0x81810 <uart_send_string>
+   80b24: fe 03 15 aa  	mov	x30, x21
+   80b28: c0 03 5f d6  	ret
+   80b2c: f3 53 41 a9  	ldp	x19, x20, [sp, #16]
+   80b30: f5 5b 42 a9  	ldp	x21, x22, [sp, #32]
+   80b34: f7 1b 40 f9  	ldr	x23, [sp, #48]
+   80b38: fd 7b c7 a8  	ldp	x29, x30, [sp], #112
+   80b3c: c0 03 5f d6  	ret
+
+0000000000080b40 <mbox_call>:
+   80b40: 00 0c 00 12  	and	w0, w0, #0xf
+   80b44: 04 00 00 f0  	adrp	x4, 0x83000 <mbox_call+0x10>
+   80b48: 81 c0 1e 91  	add	x1, x4, #1968
+   80b4c: 02 13 97 d2  	mov	x2, #47256
+   80b50: 00 00 01 2a  	orr	w0, w0, w1
+   80b54: 02 e0 a7 f2  	movk	x2, #16128, lsl #16
+   80b58: 1f 20 03 d5  	nop
+   80b5c: 41 00 40 b9  	ldr	w1, [x2]
+   80b60: c1 ff ff 37  	tbnz	w1, #31, 0x80b58 <mbox_call+0x18>
+   80b64: 01 14 97 d2  	mov	x1, #47264
+   80b68: 02 13 97 d2  	mov	x2, #47256
+   80b6c: 01 e0 a7 f2  	movk	x1, #16128, lsl #16
+   80b70: 03 10 97 d2  	mov	x3, #47232
+   80b74: 02 e0 a7 f2  	movk	x2, #16128, lsl #16
+   80b78: 03 e0 a7 f2  	movk	x3, #16128, lsl #16
+   80b7c: 20 00 00 b9  	str	w0, [x1]
+   80b80: 1f 20 03 d5  	nop
+   80b84: 41 00 40 b9  	ldr	w1, [x2]
+   80b88: c1 ff f7 37  	tbnz	w1, #30, 0x80b80 <mbox_call+0x40>
+   80b8c: 61 00 40 b9  	ldr	w1, [x3]
+   80b90: 3f 00 00 6b  	cmp	w1, w0
+   80b94: 61 ff ff 54  	b.ne	0x80b80 <mbox_call+0x40>
+   80b98: 84 c0 1e 91  	add	x4, x4, #1968
+   80b9c: 00 00 b0 52  	mov	w0, #-2147483648
+   80ba0: 81 04 40 b9  	ldr	w1, [x4, #4]
+   80ba4: 3f 00 00 6b  	cmp	w1, w0
+   80ba8: e0 17 9f 1a  	cset	w0, eq
+   80bac: c0 03 5f d6  	ret
+
+0000000000080bb0 <get_board_revision>:
+   80bb0: fd 7b be a9  	stp	x29, x30, [sp, #-32]!
+   80bb4: fd 03 00 91  	mov	x29, sp
+   80bb8: f3 53 01 a9  	stp	x19, x20, [sp, #16]
+   80bbc: f4 03 00 aa  	mov	x20, x0
+   80bc0: b1 01 00 94  	bl	0x81284 <get_length>
+   80bc4: 1f 28 00 71  	cmp	w0, #10
+   80bc8: 80 00 00 54  	b.eq	0x80bd8 <get_board_revision+0x28>
+   80bcc: f3 53 41 a9  	ldp	x19, x20, [sp, #16]
+   80bd0: fd 7b c2 a8  	ldp	x29, x30, [sp], #32
+   80bd4: c0 03 5f d6  	ret
+   80bd8: 13 00 00 f0  	adrp	x19, 0x83000 <get_board_revision+0x34>
+   80bdc: 83 03 80 52  	mov	w3, #28
+   80be0: 42 00 80 52  	mov	w2, #2
+   80be4: 81 00 80 52  	mov	w1, #4
+   80be8: 73 c6 43 f9  	ldr	x19, [x19, #1928]
+   80bec: 22 00 a0 72  	movk	w2, #1, lsl #16
+   80bf0: 00 01 80 52  	mov	w0, #8
+   80bf4: 63 02 00 b9  	str	w3, [x19]
+   80bf8: 7f 06 00 b9  	str	wzr, [x19, #4]
+   80bfc: 62 0a 00 b9  	str	w2, [x19, #8]
+   80c00: 61 0e 00 b9  	str	w1, [x19, #12]
+   80c04: 7f 12 00 b9  	str	wzr, [x19, #16]
+   80c08: 7f 16 00 b9  	str	wzr, [x19, #20]
+   80c0c: 7f 1a 00 b9  	str	wzr, [x19, #24]
+   80c10: cc ff ff 97  	bl	0x80b40 <mbox_call>
+   80c14: 60 16 40 b9  	ldr	w0, [x19, #20]
+   80c18: e1 03 14 aa  	mov	x1, x20
+   80c1c: f3 53 41 a9  	ldp	x19, x20, [sp, #16]
+   80c20: fd 7b c2 a8  	ldp	x29, x30, [sp], #32
+   80c24: 33 02 00 14  	b	0x814f0 <htos>
+   80c28: 1f 20 03 d5  	nop
+   80c2c: 1f 20 03 d5  	nop
+
+0000000000080c30 <get_vc_base>:
+   80c30: fd 7b be a9  	stp	x29, x30, [sp, #-32]!
+   80c34: fd 03 00 91  	mov	x29, sp
+   80c38: f3 53 01 a9  	stp	x19, x20, [sp, #16]
+   80c3c: f4 03 00 aa  	mov	x20, x0
+   80c40: 91 01 00 94  	bl	0x81284 <get_length>
+   80c44: 1f 28 00 71  	cmp	w0, #10
+   80c48: 80 00 00 54  	b.eq	0x80c58 <get_vc_base+0x28>
+   80c4c: f3 53 41 a9  	ldp	x19, x20, [sp, #16]
+   80c50: fd 7b c2 a8  	ldp	x29, x30, [sp], #32
+   80c54: c0 03 5f d6  	ret
+   80c58: 13 00 00 f0  	adrp	x19, 0x83000 <get_vc_base+0x34>
+   80c5c: 03 04 80 52  	mov	w3, #32
+   80c60: c2 00 80 52  	mov	w2, #6
+   80c64: 01 01 80 52  	mov	w1, #8
+   80c68: 73 c6 43 f9  	ldr	x19, [x19, #1928]
+   80c6c: 22 00 a0 72  	movk	w2, #1, lsl #16
+   80c70: e0 03 01 2a  	mov	w0, w1
+   80c74: 63 02 00 b9  	str	w3, [x19]
+   80c78: 7f 06 00 b9  	str	wzr, [x19, #4]
+   80c7c: 62 0a 00 b9  	str	w2, [x19, #8]
+   80c80: 61 0e 00 b9  	str	w1, [x19, #12]
+   80c84: 7f 12 00 b9  	str	wzr, [x19, #16]
+   80c88: 7f 16 00 b9  	str	wzr, [x19, #20]
+   80c8c: 7f 1a 00 b9  	str	wzr, [x19, #24]
+   80c90: 7f 1e 00 b9  	str	wzr, [x19, #28]
+   80c94: ab ff ff 97  	bl	0x80b40 <mbox_call>
+   80c98: 60 16 40 b9  	ldr	w0, [x19, #20]
+   80c9c: e1 03 14 aa  	mov	x1, x20
+   80ca0: f3 53 41 a9  	ldp	x19, x20, [sp, #16]
+   80ca4: fd 7b c2 a8  	ldp	x29, x30, [sp], #32
+   80ca8: 12 02 00 14  	b	0x814f0 <htos>
+   80cac: 00 00 00 00  	udf	#0
+
+0000000000080cb0 <reset>:
+   80cb0: 82 03 80 d2  	mov	x2, #28
+   80cb4: 81 04 80 d2  	mov	x1, #36
+   80cb8: 02 e2 a7 f2  	movk	x2, #16144, lsl #16
+   80cbc: 01 e2 a7 f2  	movk	x1, #16144, lsl #16
+   80cc0: 03 04 80 52  	mov	w3, #32
+   80cc4: 03 40 ab 72  	movk	w3, #23040, lsl #16
+   80cc8: 43 00 00 b9  	str	w3, [x2]
+   80ccc: 02 40 ab 52  	mov	w2, #1509949440
+   80cd0: 00 00 02 2a  	orr	w0, w0, w2
+   80cd4: 20 00 00 b9  	str	w0, [x1]
+   80cd8: c0 03 5f d6  	ret
+   80cdc: 1f 20 03 d5  	nop
+
+0000000000080ce0 <cancel_reset>:
+   80ce0: 82 03 80 d2  	mov	x2, #28
+   80ce4: 81 04 80 d2  	mov	x1, #36
+   80ce8: 02 e2 a7 f2  	movk	x2, #16144, lsl #16
+   80cec: 01 e2 a7 f2  	movk	x1, #16144, lsl #16
+   80cf0: 00 40 ab 52  	mov	w0, #1509949440
+   80cf4: 40 00 00 b9  	str	w0, [x2]
+   80cf8: 20 00 00 b9  	str	w0, [x1]
+   80cfc: c0 03 5f d6  	ret
+
+0000000000080d00 <parse_command>:
+   80d00: fd 7b bc a9  	stp	x29, x30, [sp, #-64]!
+   80d04: 01 00 00 f0  	adrp	x1, 0x83000 <parse_command+0x10>
+   80d08: fd 03 00 91  	mov	x29, sp
+   80d0c: f3 53 01 a9  	stp	x19, x20, [sp, #16]
+   80d10: f3 03 00 aa  	mov	x19, x0
+   80d14: 20 40 48 b9  	ldr	w0, [x1, #2112]
+   80d18: 1f 04 00 71  	cmp	w0, #1
+   80d1c: 00 0a 00 54  	b.eq	0x80e5c <parse_command+0x15c>
+   80d20: 01 00 00 f0  	adrp	x1, 0x83000 <parse_command+0x2c>
+   80d24: e0 03 13 aa  	mov	x0, x19
+   80d28: 21 60 04 91  	add	x1, x1, #280
+   80d2c: 49 01 00 94  	bl	0x81250 <strcmp>
+   80d30: 80 00 00 35  	cbnz	w0, 0x80d40 <parse_command+0x40>
+   80d34: f3 53 41 a9  	ldp	x19, x20, [sp, #16]
+   80d38: fd 7b c4 a8  	ldp	x29, x30, [sp], #64
+   80d3c: c0 03 5f d6  	ret
+   80d40: e0 03 13 aa  	mov	x0, x19
+   80d44: 01 00 00 f0  	adrp	x1, 0x83000 <parse_command+0x50>
+   80d48: 21 80 04 91  	add	x1, x1, #288
+   80d4c: 41 01 00 94  	bl	0x81250 <strcmp>
+   80d50: e1 03 00 2a  	mov	w1, w0
+   80d54: 20 00 80 52  	mov	w0, #1
+   80d58: e1 fe ff 34  	cbz	w1, 0x80d34 <parse_command+0x34>
+   80d5c: e0 03 13 aa  	mov	x0, x19
+   80d60: 01 00 00 f0  	adrp	x1, 0x83000 <parse_command+0x6c>
+   80d64: 21 a0 04 91  	add	x1, x1, #296
+   80d68: 3a 01 00 94  	bl	0x81250 <strcmp>
+   80d6c: e1 03 00 2a  	mov	w1, w0
+   80d70: 40 00 80 52  	mov	w0, #2
+   80d74: 01 fe ff 34  	cbz	w1, 0x80d34 <parse_command+0x34>
+   80d78: e0 03 13 aa  	mov	x0, x19
+   80d7c: 01 00 00 f0  	adrp	x1, 0x83000 <parse_command+0x88>
+   80d80: 21 c0 04 91  	add	x1, x1, #304
+   80d84: 33 01 00 94  	bl	0x81250 <strcmp>
+   80d88: e1 03 00 2a  	mov	w1, w0
+   80d8c: 60 00 80 52  	mov	w0, #3
+   80d90: 21 fd ff 34  	cbz	w1, 0x80d34 <parse_command+0x34>
+   80d94: e0 03 13 aa  	mov	x0, x19
+   80d98: 01 00 00 f0  	adrp	x1, 0x83000 <parse_command+0xa4>
+   80d9c: 21 00 05 91  	add	x1, x1, #320
+   80da0: 2c 01 00 94  	bl	0x81250 <strcmp>
+   80da4: e1 03 00 2a  	mov	w1, w0
+   80da8: 80 00 80 52  	mov	w0, #4
+   80dac: 41 fc ff 34  	cbz	w1, 0x80d34 <parse_command+0x34>
+   80db0: e0 03 13 aa  	mov	x0, x19
+   80db4: 01 00 00 f0  	adrp	x1, 0x83000 <parse_command+0xc0>
+   80db8: 21 40 05 91  	add	x1, x1, #336
+   80dbc: 25 01 00 94  	bl	0x81250 <strcmp>
+   80dc0: e1 03 00 2a  	mov	w1, w0
+   80dc4: a0 00 80 52  	mov	w0, #5
+   80dc8: 61 fb ff 34  	cbz	w1, 0x80d34 <parse_command+0x34>
+   80dcc: e0 03 13 aa  	mov	x0, x19
+   80dd0: 01 00 00 f0  	adrp	x1, 0x83000 <parse_command+0xdc>
+   80dd4: 21 60 05 91  	add	x1, x1, #344
+   80dd8: 1e 01 00 94  	bl	0x81250 <strcmp>
+   80ddc: e1 03 00 2a  	mov	w1, w0
+   80de0: c0 00 80 52  	mov	w0, #6
+   80de4: 81 fa ff 34  	cbz	w1, 0x80d34 <parse_command+0x34>
+   80de8: e0 03 13 aa  	mov	x0, x19
+   80dec: 01 00 00 f0  	adrp	x1, 0x83000 <parse_command+0xf8>
+   80df0: 21 a0 05 91  	add	x1, x1, #360
+   80df4: 17 01 00 94  	bl	0x81250 <strcmp>
+   80df8: e1 03 00 2a  	mov	w1, w0
+   80dfc: e0 00 80 52  	mov	w0, #7
+   80e00: a1 f9 ff 34  	cbz	w1, 0x80d34 <parse_command+0x34>
+   80e04: e0 03 13 aa  	mov	x0, x19
+   80e08: 01 00 00 f0  	adrp	x1, 0x83000 <parse_command+0x114>
+   80e0c: 21 e0 05 91  	add	x1, x1, #376
+   80e10: 10 01 00 94  	bl	0x81250 <strcmp>
+   80e14: e1 03 00 2a  	mov	w1, w0
+   80e18: 00 01 80 52  	mov	w0, #8
+   80e1c: c1 f8 ff 34  	cbz	w1, 0x80d34 <parse_command+0x34>
+   80e20: e0 03 13 aa  	mov	x0, x19
+   80e24: 01 00 00 f0  	adrp	x1, 0x83000 <parse_command+0x130>
+   80e28: 21 00 06 91  	add	x1, x1, #384
+   80e2c: 09 01 00 94  	bl	0x81250 <strcmp>
+   80e30: e1 03 00 2a  	mov	w1, w0
+   80e34: 20 01 80 52  	mov	w0, #9
+   80e38: e1 f7 ff 34  	cbz	w1, 0x80d34 <parse_command+0x34>
+   80e3c: e0 03 13 aa  	mov	x0, x19
+   80e40: 01 00 00 f0  	adrp	x1, 0x83000 <parse_command+0x14c>
+   80e44: 21 20 06 91  	add	x1, x1, #392
+   80e48: 02 01 00 94  	bl	0x81250 <strcmp>
+   80e4c: 1f 00 00 71  	cmp	w0, #0
+   80e50: 41 01 80 52  	mov	w1, #10
+   80e54: 20 00 9f 5a  	csinv	w0, w1, wzr, eq
+   80e58: b7 ff ff 17  	b	0x80d34 <parse_command+0x34>
+   80e5c: 02 00 00 f0  	adrp	x2, 0x83000 <parse_command+0x168>
+   80e60: 42 40 06 91  	add	x2, x2, #400
+   80e64: e1 03 13 aa  	mov	x1, x19
+   80e68: f4 a3 00 91  	add	x20, sp, #40
+   80e6c: e0 03 14 aa  	mov	x0, x20
+   80e70: 44 14 40 a9  	ldp	x4, x5, [x2]
+   80e74: e4 97 02 a9  	stp	x4, x5, [sp, #40]
+   80e78: 42 20 40 79  	ldrh	w2, [x2, #16]
+   80e7c: e2 73 00 79  	strh	w2, [sp, #56]
+   80e80: 0c 01 00 94  	bl	0x812b0 <string_concat>
+   80e84: e0 03 14 aa  	mov	x0, x20
+   80e88: 62 02 00 94  	bl	0x81810 <uart_send_string>
+   80e8c: 00 00 00 f0  	adrp	x0, 0x83000 <parse_command+0x198>
+   80e90: 00 40 0d 91  	add	x0, x0, #848
+   80e94: 5f 02 00 94  	bl	0x81810 <uart_send_string>
+   80e98: a2 ff ff 17  	b	0x80d20 <parse_command+0x20>
+   80e9c: 1f 20 03 d5  	nop
+
+0000000000080ea0 <execute_command>:
+   80ea0: fd 7b bb a9  	stp	x29, x30, [sp, #-80]!
+   80ea4: fd 03 00 91  	mov	x29, sp
+   80ea8: 1f 14 00 71  	cmp	w0, #5
+   80eac: c0 0a 00 54  	b.eq	0x81004 <execute_command+0x164>
+   80eb0: 6c 01 00 54  	b.gt	0x80edc <execute_command+0x3c>
+   80eb4: 1f 08 00 71  	cmp	w0, #2
+   80eb8: a0 0c 00 54  	b.eq	0x8104c <execute_command+0x1ac>
+   80ebc: 6c 06 00 54  	b.gt	0x80f88 <execute_command+0xe8>
+   80ec0: 20 0d 00 34  	cbz	w0, 0x81064 <execute_command+0x1c4>
+   80ec4: 1f 04 00 71  	cmp	w0, #1
+   80ec8: 41 05 00 54  	b.ne	0x80f70 <execute_command+0xd0>
+   80ecc: fd 7b c5 a8  	ldp	x29, x30, [sp], #80
+   80ed0: 00 00 00 f0  	adrp	x0, 0x83000 <execute_command+0x3c>
+   80ed4: 00 a0 0c 91  	add	x0, x0, #808
+   80ed8: 4e 02 00 14  	b	0x81810 <uart_send_string>
+   80edc: 1f 20 00 71  	cmp	w0, #8
+   80ee0: 60 10 00 54  	b.eq	0x810ec <execute_command+0x24c>
+   80ee4: 8d 03 00 54  	b.le	0x80f54 <execute_command+0xb4>
+   80ee8: 1f 24 00 71  	cmp	w0, #9
+   80eec: 60 10 00 54  	b.eq	0x810f8 <execute_command+0x258>
+   80ef0: 1f 28 00 71  	cmp	w0, #10
+   80ef4: c1 02 00 54  	b.ne	0x80f4c <execute_command+0xac>
+   80ef8: f3 53 01 a9  	stp	x19, x20, [sp, #16]
+   80efc: 40 42 38 d5  	mrs	x0, CurrentEL
+   80f00: 02 00 00 f0  	adrp	x2, 0x83000 <execute_command+0x6c>
+   80f04: 42 a0 01 91  	add	x2, x2, #104
+   80f08: f3 c3 00 91  	add	x19, sp, #48
+   80f0c: 00 0c 42 d3  	ubfx	x0, x0, #2, #2
+   80f10: e1 03 13 aa  	mov	x1, x19
+   80f14: 43 00 40 f9  	ldr	x3, [x2]
+   80f18: e3 1b 00 f9  	str	x3, [sp, #48]
+   80f1c: 42 70 40 b8  	ldur	w2, [x2, #7]
+   80f20: e2 73 03 b8  	stur	w2, [sp, #55]
+   80f24: 73 01 00 94  	bl	0x814f0 <htos>
+   80f28: 00 00 00 f0  	adrp	x0, 0x83000 <execute_command+0x94>
+   80f2c: 00 60 01 91  	add	x0, x0, #88
+   80f30: 38 02 00 94  	bl	0x81810 <uart_send_string>
+   80f34: e0 03 13 aa  	mov	x0, x19
+   80f38: 36 02 00 94  	bl	0x81810 <uart_send_string>
+   80f3c: 00 00 00 f0  	adrp	x0, 0x83000 <execute_command+0xa8>
+   80f40: 00 40 0d 91  	add	x0, x0, #848
+   80f44: 33 02 00 94  	bl	0x81810 <uart_send_string>
+   80f48: f3 53 41 a9  	ldp	x19, x20, [sp, #16]
+   80f4c: fd 7b c5 a8  	ldp	x29, x30, [sp], #80
+   80f50: c0 03 5f d6  	ret
+   80f54: 1f 18 00 71  	cmp	w0, #6
+   80f58: 40 10 00 54  	b.eq	0x81160 <execute_command+0x2c0>
+   80f5c: 1f 1c 00 71  	cmp	w0, #7
+   80f60: 61 ff ff 54  	b.ne	0x80f4c <execute_command+0xac>
+   80f64: 08 00 80 d2  	mov	x8, #0
+   80f68: 00 00 20 d4  	brk	#0
+   80f6c: f8 ff ff 17  	b	0x80f4c <execute_command+0xac>
+   80f70: 1f 04 00 31  	cmn	w0, #1
+   80f74: c1 fe ff 54  	b.ne	0x80f4c <execute_command+0xac>
+   80f78: fd 7b c5 a8  	ldp	x29, x30, [sp], #80
+   80f7c: 00 00 00 f0  	adrp	x0, 0x83000 <execute_command+0xe8>
+   80f80: 00 60 0d 91  	add	x0, x0, #856
+   80f84: 23 02 00 14  	b	0x81810 <uart_send_string>
+   80f88: f3 53 01 a9  	stp	x19, x20, [sp, #16]
+   80f8c: 1f 0c 00 71  	cmp	w0, #3
+   80f90: 40 0f 00 54  	b.eq	0x81178 <execute_command+0x2d8>
+   80f94: 01 00 00 f0  	adrp	x1, 0x83000 <execute_command+0x100>
+   80f98: 21 e0 0d 91  	add	x1, x1, #888
+   80f9c: 02 00 00 f0  	adrp	x2, 0x83000 <execute_command+0x108>
+   80fa0: 42 a0 01 91  	add	x2, x2, #104
+   80fa4: f3 83 00 91  	add	x19, sp, #32
+   80fa8: f4 c3 00 91  	add	x20, sp, #48
+   80fac: 24 14 40 a9  	ldp	x4, x5, [x1]
+   80fb0: e4 17 03 a9  	stp	x4, x5, [sp, #48]
+   80fb4: 21 10 40 b9  	ldr	w1, [x1, #16]
+   80fb8: 40 00 40 f9  	ldr	x0, [x2]
+   80fbc: e0 13 00 f9  	str	x0, [sp, #32]
+   80fc0: 42 70 40 b8  	ldur	w2, [x2, #7]
+   80fc4: e0 03 13 aa  	mov	x0, x19
+   80fc8: e2 73 02 b8  	stur	w2, [sp, #39]
+   80fcc: e1 43 00 b9  	str	w1, [sp, #64]
+   80fd0: f8 fe ff 97  	bl	0x80bb0 <get_board_revision>
+   80fd4: e1 03 13 aa  	mov	x1, x19
+   80fd8: e0 03 14 aa  	mov	x0, x20
+   80fdc: b5 00 00 94  	bl	0x812b0 <string_concat>
+   80fe0: 01 00 00 f0  	adrp	x1, 0x83000 <execute_command+0x14c>
+   80fe4: 21 40 0d 91  	add	x1, x1, #848
+   80fe8: e0 03 14 aa  	mov	x0, x20
+   80fec: b1 00 00 94  	bl	0x812b0 <string_concat>
+   80ff0: e0 03 14 aa  	mov	x0, x20
+   80ff4: 07 02 00 94  	bl	0x81810 <uart_send_string>
+   80ff8: f3 53 41 a9  	ldp	x19, x20, [sp, #16]
+   80ffc: fd 7b c5 a8  	ldp	x29, x30, [sp], #80
+   81000: c0 03 5f d6  	ret
+   81004: 02 00 00 d0  	adrp	x2, 0x83000 <execute_command+0x16c>
+   81008: 01 00 00 d0  	adrp	x1, 0x83000 <execute_command+0x170>
+   8100c: 42 a0 01 91  	add	x2, x2, #104
+   81010: 21 40 0e 91  	add	x1, x1, #912
+   81014: f3 53 01 a9  	stp	x19, x20, [sp, #16]
+   81018: f3 c3 00 91  	add	x19, sp, #48
+   8101c: f4 83 00 91  	add	x20, sp, #32
+   81020: 23 00 40 f9  	ldr	x3, [x1]
+   81024: e3 13 00 f9  	str	x3, [sp, #32]
+   81028: 21 10 40 79  	ldrh	w1, [x1, #8]
+   8102c: 40 00 40 f9  	ldr	x0, [x2]
+   81030: e0 1b 00 f9  	str	x0, [sp, #48]
+   81034: 42 70 40 b8  	ldur	w2, [x2, #7]
+   81038: e0 03 13 aa  	mov	x0, x19
+   8103c: e1 53 00 79  	strh	w1, [sp, #40]
+   81040: e2 73 03 b8  	stur	w2, [sp, #55]
+   81044: fb fe ff 97  	bl	0x80c30 <get_vc_base>
+   81048: e3 ff ff 17  	b	0x80fd4 <execute_command+0x134>
+   8104c: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x1b4>
+   81050: 00 e0 0c 91  	add	x0, x0, #824
+   81054: ef 01 00 94  	bl	0x81810 <uart_send_string>
+   81058: fd 7b c5 a8  	ldp	x29, x30, [sp], #80
+   8105c: 00 7d 80 52  	mov	w0, #1000
+   81060: 14 ff ff 17  	b	0x80cb0 <reset>
+   81064: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x1cc>
+   81068: 00 a0 06 91  	add	x0, x0, #424
+   8106c: e9 01 00 94  	bl	0x81810 <uart_send_string>
+   81070: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x1d8>
+   81074: 00 00 07 91  	add	x0, x0, #448
+   81078: e6 01 00 94  	bl	0x81810 <uart_send_string>
+   8107c: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x1e4>
+   81080: 00 60 07 91  	add	x0, x0, #472
+   81084: e3 01 00 94  	bl	0x81810 <uart_send_string>
+   81088: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x1f0>
+   8108c: 00 e0 07 91  	add	x0, x0, #504
+   81090: e0 01 00 94  	bl	0x81810 <uart_send_string>
+   81094: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x1fc>
+   81098: 00 60 08 91  	add	x0, x0, #536
+   8109c: dd 01 00 94  	bl	0x81810 <uart_send_string>
+   810a0: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x208>
+   810a4: 00 00 09 91  	add	x0, x0, #576
+   810a8: da 01 00 94  	bl	0x81810 <uart_send_string>
+   810ac: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x214>
+   810b0: 00 a0 09 91  	add	x0, x0, #616
+   810b4: d7 01 00 94  	bl	0x81810 <uart_send_string>
+   810b8: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x220>
+   810bc: 00 40 0a 91  	add	x0, x0, #656
+   810c0: d4 01 00 94  	bl	0x81810 <uart_send_string>
+   810c4: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x22c>
+   810c8: 00 e0 0a 91  	add	x0, x0, #696
+   810cc: d1 01 00 94  	bl	0x81810 <uart_send_string>
+   810d0: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x238>
+   810d4: 00 80 0b 91  	add	x0, x0, #736
+   810d8: ce 01 00 94  	bl	0x81810 <uart_send_string>
+   810dc: fd 7b c5 a8  	ldp	x29, x30, [sp], #80
+   810e0: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x248>
+   810e4: 00 20 0c 91  	add	x0, x0, #776
+   810e8: ca 01 00 14  	b	0x81810 <uart_send_string>
+   810ec: 28 00 80 d2  	mov	x8, #1
+   810f0: 00 00 20 d4  	brk	#0
+   810f4: 96 ff ff 17  	b	0x80f4c <execute_command+0xac>
+   810f8: f3 53 01 a9  	stp	x19, x20, [sp, #16]
+   810fc: 20 42 3b d5  	mrs	x0, DAIF
+   81100: 02 00 00 d0  	adrp	x2, 0x83000 <execute_command+0x268>
+   81104: 42 a0 01 91  	add	x2, x2, #104
+   81108: f4 83 00 91  	add	x20, sp, #32
+   8110c: 00 20 05 53  	ubfx	w0, w0, #5, #4
+   81110: e1 03 14 aa  	mov	x1, x20
+   81114: f3 c3 00 91  	add	x19, sp, #48
+   81118: 43 00 40 f9  	ldr	x3, [x2]
+   8111c: e3 13 00 f9  	str	x3, [sp, #32]
+   81120: 42 70 40 b8  	ldur	w2, [x2, #7]
+   81124: e2 73 02 b8  	stur	w2, [sp, #39]
+   81128: f2 00 00 94  	bl	0x814f0 <htos>
+   8112c: ff 23 00 f9  	str	xzr, [sp, #64]
+   81130: 82 28 88 d2  	mov	x2, #16708
+   81134: 03 00 80 d2  	mov	x3, #0
+   81138: 22 c9 a8 f2  	movk	x2, #17993, lsl #16
+   8113c: e1 03 14 aa  	mov	x1, x20
+   81140: 02 24 cd f2  	movk	x2, #26912, lsl #32
+   81144: e0 03 13 aa  	mov	x0, x19
+   81148: 62 0e e4 f2  	movk	x2, #8307, lsl #48
+   8114c: e2 0f 03 a9  	stp	x2, x3, [sp, #48]
+   81150: ff 4b 00 b9  	str	wzr, [sp, #72]
+   81154: ff 9b 00 79  	strh	wzr, [sp, #76]
+   81158: 56 00 00 94  	bl	0x812b0 <string_concat>
+   8115c: 76 ff ff 17  	b	0x80f34 <execute_command+0x94>
+   81160: 08 00 80 d2  	mov	x8, #0
+   81164: 01 00 00 d4  	svc	#0
+   81168: fd 7b c5 a8  	ldp	x29, x30, [sp], #80
+   8116c: 00 00 00 d0  	adrp	x0, 0x83000 <execute_command+0x2d4>
+   81170: 00 20 0d 91  	add	x0, x0, #840
+   81174: a7 01 00 14  	b	0x81810 <uart_send_string>
+   81178: 02 00 00 d0  	adrp	x2, 0x83000 <execute_command+0x2e0>
+   8117c: 42 80 0e 91  	add	x2, x2, #928
+   81180: 01 00 00 d0  	adrp	x1, 0x83000 <execute_command+0x2e8>
+   81184: 21 40 0d 91  	add	x1, x1, #848
+   81188: f3 c3 00 91  	add	x19, sp, #48
+   8118c: 43 00 40 f9  	ldr	x3, [x2]
+   81190: e3 1b 00 f9  	str	x3, [sp, #48]
+   81194: 42 70 40 f8  	ldur	x2, [x2, #7]
+   81198: e0 03 13 aa  	mov	x0, x19
+   8119c: e2 73 03 f8  	stur	x2, [sp, #55]
+   811a0: 44 00 00 94  	bl	0x812b0 <string_concat>
+   811a4: e0 03 13 aa  	mov	x0, x19
+   811a8: 9a 01 00 94  	bl	0x81810 <uart_send_string>
+   811ac: f3 53 41 a9  	ldp	x19, x20, [sp, #16]
+   811b0: 67 ff ff 17  	b	0x80f4c <execute_command+0xac>
+
+00000000000811b4 <shell_run>:
+   811b4: fd 7b b5 a9  	stp	x29, x30, [sp, #-176]!
+   811b8: 00 00 00 d0  	adrp	x0, 0x83000 <shell_run+0xc>
+   811bc: 00 c0 0e 91  	add	x0, x0, #944
+   811c0: fd 03 00 91  	mov	x29, sp
+   811c4: f3 53 01 a9  	stp	x19, x20, [sp, #16]
+   811c8: 14 00 00 d0  	adrp	x20, 0x83000 <shell_run+0x1c>
+   811cc: 94 42 0d 91  	add	x20, x20, #848
+   811d0: f5 5b 02 a9  	stp	x21, x22, [sp, #32]
+   811d4: 16 00 00 d0  	adrp	x22, 0x83000 <shell_run+0x28>
+   811d8: f5 c3 00 91  	add	x21, sp, #48
+   811dc: d6 22 0f 91  	add	x22, x22, #968
+   811e0: 8c 01 00 94  	bl	0x81810 <uart_send_string>
+   811e4: 1f 20 03 d5  	nop
+   811e8: e0 03 16 aa  	mov	x0, x22
+   811ec: 89 01 00 94  	bl	0x81810 <uart_send_string>
+   811f0: f3 03 15 aa  	mov	x19, x21
+   811f4: 77 01 00 94  	bl	0x817d0 <uart_get>
+   811f8: e1 03 00 2a  	mov	w1, w0
+   811fc: 00 1c 00 12  	and	w0, w0, #0xff
+   81200: 1f 28 00 71  	cmp	w0, #10
+   81204: 00 01 00 54  	b.eq	0x81224 <shell_run+0x70>
+   81208: 61 16 00 38  	strb	w1, [x19], #1
+   8120c: 65 01 00 94  	bl	0x817a0 <uart_send>
+   81210: 70 01 00 94  	bl	0x817d0 <uart_get>
+   81214: e1 03 00 2a  	mov	w1, w0
+   81218: 00 1c 00 12  	and	w0, w0, #0xff
+   8121c: 1f 28 00 71  	cmp	w0, #10
+   81220: 41 ff ff 54  	b.ne	0x81208 <shell_run+0x54>
+   81224: e0 03 14 aa  	mov	x0, x20
+   81228: 7a 01 00 94  	bl	0x81810 <uart_send_string>
+   8122c: 7f 02 00 39  	strb	wzr, [x19]
+   81230: e0 03 15 aa  	mov	x0, x21
+   81234: b3 fe ff 97  	bl	0x80d00 <parse_command>
+   81238: 1a ff ff 97  	bl	0x80ea0 <execute_command>
+   8123c: e0 03 14 aa  	mov	x0, x20
+   81240: 74 01 00 94  	bl	0x81810 <uart_send_string>
+   81244: e9 ff ff 17  	b	0x811e8 <shell_run+0x34>
+		...
+
+0000000000081250 <strcmp>:
+   81250: 02 00 40 39  	ldrb	w2, [x0]
+   81254: 23 00 40 39  	ldrb	w3, [x1]
+   81258: 7f 00 02 6b  	cmp	w3, w2
+   8125c: c1 00 00 54  	b.ne	0x81274 <strcmp+0x24>
+   81260: e2 00 00 34  	cbz	w2, 0x8127c <strcmp+0x2c>
+   81264: 02 1c 40 38  	ldrb	w2, [x0, #1]!
+   81268: 23 1c 40 38  	ldrb	w3, [x1, #1]!
+   8126c: 7f 00 02 6b  	cmp	w3, w2
+   81270: 80 ff ff 54  	b.eq	0x81260 <strcmp+0x10>
+   81274: 00 00 01 4b  	sub	w0, w0, w1
+   81278: c0 03 5f d6  	ret
+   8127c: 00 00 80 52  	mov	w0, #0
+   81280: c0 03 5f d6  	ret
+
+0000000000081284 <get_length>:
+   81284: e1 03 00 aa  	mov	x1, x0
+   81288: 20 14 40 38  	ldrb	w0, [x1], #1
+   8128c: e0 00 00 34  	cbz	w0, 0x812a8 <get_length+0x24>
+   81290: 23 00 80 52  	mov	w3, #1
+   81294: 63 00 01 4b  	sub	w3, w3, w1
+   81298: 60 00 01 0b  	add	w0, w3, w1
+   8129c: 22 14 40 38  	ldrb	w2, [x1], #1
+   812a0: c2 ff ff 35  	cbnz	w2, 0x81298 <get_length+0x14>
+   812a4: c0 03 5f d6  	ret
+   812a8: 00 00 80 52  	mov	w0, #0
+   812ac: c0 03 5f d6  	ret
+
+00000000000812b0 <string_concat>:
+   812b0: 02 1c 40 38  	ldrb	w2, [x0, #1]!
+   812b4: e2 ff ff 35  	cbnz	w2, 0x812b0 <string_concat>
+   812b8: 22 00 40 39  	ldrb	w2, [x1]
+   812bc: 82 00 00 34  	cbz	w2, 0x812cc <string_concat+0x1c>
+   812c0: 02 14 00 38  	strb	w2, [x0], #1
+   812c4: 22 1c 40 38  	ldrb	w2, [x1, #1]!
+   812c8: c2 ff ff 35  	cbnz	w2, 0x812c0 <string_concat+0x10>
+   812cc: 1f 00 00 39  	strb	wzr, [x0]
+   812d0: c0 03 5f d6  	ret
+
+00000000000812d4 <reverse_string>:
+   812d4: e5 03 00 aa  	mov	x5, x0
+   812d8: a3 14 40 38  	ldrb	w3, [x5], #1
+   812dc: 83 02 00 34  	cbz	w3, 0x8132c <reverse_string+0x58>
+   812e0: 26 00 80 52  	mov	w6, #1
+   812e4: e2 03 05 aa  	mov	x2, x5
+   812e8: c6 00 05 4b  	sub	w6, w6, w5
+   812ec: 1f 20 03 d5  	nop
+   812f0: c1 00 02 0b  	add	w1, w6, w2
+   812f4: 44 14 40 38  	ldrb	w4, [x2], #1
+   812f8: c4 ff ff 35  	cbnz	w4, 0x812f0 <reverse_string+0x1c>
+   812fc: 22 7c 01 13  	asr	w2, w1, #1
+   81300: 62 01 00 34  	cbz	w2, 0x8132c <reverse_string+0x58>
+   81304: 42 04 00 51  	sub	w2, w2, #1
+   81308: 01 c0 21 8b  	add	x1, x0, w1, sxtw
+   8130c: a4 00 02 8b  	add	x4, x5, x2
+   81310: 02 00 00 14  	b	0x81318 <reverse_string+0x44>
+   81314: 03 00 40 39  	ldrb	w3, [x0]
+   81318: 22 f0 5f 38  	ldurb	w2, [x1, #-1]
+   8131c: 23 fc 1f 38  	strb	w3, [x1, #-1]!
+   81320: 02 14 00 38  	strb	w2, [x0], #1
+   81324: 1f 00 04 eb  	cmp	x0, x4
+   81328: 61 ff ff 54  	b.ne	0x81314 <reverse_string+0x40>
+   8132c: c0 03 5f d6  	ret
+
+0000000000081330 <itos>:
+   81330: e4 03 00 aa  	mov	x4, x0
+   81334: e5 03 01 aa  	mov	x5, x1
+   81338: e0 03 01 aa  	mov	x0, x1
+   8133c: a4 00 00 b5  	cbnz	x4, 0x81350 <itos+0x20>
+   81340: 01 06 80 52  	mov	w1, #48
+   81344: a1 14 00 38  	strb	w1, [x5], #1
+   81348: bf 00 00 39  	strb	wzr, [x5]
+   8134c: e2 ff ff 17  	b	0x812d4 <reverse_string>
+   81350: e1 e7 02 b2  	mov	x1, #-3689348814741910324
+   81354: a1 99 99 f2  	movk	x1, #52429
+   81358: 83 7c c1 9b  	umulh	x3, x4, x1
+   8135c: e6 03 04 aa  	mov	x6, x4
+   81360: 63 fc 43 d3  	lsr	x3, x3, #3
+   81364: 62 08 03 8b  	add	x2, x3, x3, lsl #2
+   81368: 82 04 02 cb  	sub	x2, x4, x2, lsl #1
+   8136c: e4 03 03 aa  	mov	x4, x3
+   81370: 42 c0 00 11  	add	w2, w2, #48
+   81374: a2 14 00 38  	strb	w2, [x5], #1
+   81378: df 24 00 f1  	cmp	x6, #9
+   8137c: e8 fe ff 54  	b.hi	0x81358 <itos+0x28>
+   81380: bf 00 00 39  	strb	wzr, [x5]
+   81384: d4 ff ff 17  	b	0x812d4 <reverse_string>
+   81388: 1f 20 03 d5  	nop
+   8138c: 1f 20 03 d5  	nop
+
+0000000000081390 <ftos>:
+   81390: 08 00 38 1e  	fcvtzs	w8, s0
+   81394: fd 7b be a9  	stp	x29, x30, [sp, #-32]!
+   81398: e7 03 00 aa  	mov	x7, x0
+   8139c: fd 03 00 91  	mov	x29, sp
+   813a0: 01 01 22 1e  	scvtf	s1, w8
+   813a4: 00 38 21 1e  	fsub	s0, s0, s1
+   813a8: 28 08 00 35  	cbnz	w8, 0x814ac <ftos+0x11c>
+   813ac: 09 04 00 91  	add	x9, x0, #1
+   813b0: 00 06 80 52  	mov	w0, #48
+   813b4: e3 03 09 aa  	mov	x3, x9
+   813b8: e0 00 00 39  	strb	w0, [x7]
+   813bc: 7f 00 00 39  	strb	wzr, [x3]
+   813c0: e0 03 07 aa  	mov	x0, x7
+   813c4: c4 ff ff 97  	bl	0x812d4 <reverse_string>
+   813c8: e1 cc 8c 52  	mov	w1, #26215
+   813cc: c1 cc ac 72  	movk	w1, #26214, lsl #16
+   813d0: 00 7d 21 9b  	smull	x0, w8, w1
+   813d4: 00 fc 62 93  	asr	x0, x0, #34
+   813d8: 08 7c 88 6b  	subs	w8, w0, w8, asr #31
+   813dc: a1 ff ff 54  	b.ne	0x813d0 <ftos+0x40>
+   813e0: e0 1c 40 38  	ldrb	w0, [x7, #1]!
+   813e4: e0 ff ff 35  	cbnz	w0, 0x813e0 <ftos+0x50>
+   813e8: 01 90 24 1e  	fmov	s1, #10.00000000
+   813ec: c0 05 80 52  	mov	w0, #46
+   813f0: e0 00 00 79  	strh	w0, [x7]
+   813f4: 00 08 21 1e  	fmul	s0, s0, s1
+   813f8: 00 08 21 1e  	fmul	s0, s0, s1
+   813fc: 00 08 21 1e  	fmul	s0, s0, s1
+   81400: 00 08 21 1e  	fmul	s0, s0, s1
+   81404: 00 08 21 1e  	fmul	s0, s0, s1
+   81408: 00 08 21 1e  	fmul	s0, s0, s1
+   8140c: 00 00 38 1e  	fcvtzs	w0, s0
+   81410: 01 7c 40 93  	sxtw	x1, w0
+   81414: e0 02 00 35  	cbnz	w0, 0x81470 <ftos+0xe0>
+   81418: e3 67 00 91  	add	x3, sp, #25
+   8141c: e8 63 00 91  	add	x8, sp, #24
+   81420: 00 06 80 52  	mov	w0, #48
+   81424: e0 63 00 39  	strb	w0, [sp, #24]
+   81428: 7f 00 00 39  	strb	wzr, [x3]
+   8142c: e0 03 08 aa  	mov	x0, x8
+   81430: a9 ff ff 97  	bl	0x812d4 <reverse_string>
+   81434: 1f 20 03 d5  	nop
+   81438: 20 01 40 39  	ldrb	w0, [x9]
+   8143c: e7 03 09 aa  	mov	x7, x9
+   81440: 29 05 00 91  	add	x9, x9, #1
+   81444: a0 ff ff 35  	cbnz	w0, 0x81438 <ftos+0xa8>
+   81448: e1 63 40 39  	ldrb	w1, [sp, #24]
+   8144c: c1 00 00 34  	cbz	w1, 0x81464 <ftos+0xd4>
+   81450: e0 03 08 aa  	mov	x0, x8
+   81454: 1f 20 03 d5  	nop
+   81458: e1 14 00 38  	strb	w1, [x7], #1
+   8145c: 01 1c 40 38  	ldrb	w1, [x0, #1]!
+   81460: c1 ff ff 35  	cbnz	w1, 0x81458 <ftos+0xc8>
+   81464: ff 00 00 39  	strb	wzr, [x7]
+   81468: fd 7b c2 a8  	ldp	x29, x30, [sp], #32
+   8146c: c0 03 5f d6  	ret
+   81470: e8 63 00 91  	add	x8, sp, #24
+   81474: e4 e7 02 b2  	mov	x4, #-3689348814741910324
+   81478: e3 03 08 aa  	mov	x3, x8
+   8147c: a4 99 99 f2  	movk	x4, #52429
+   81480: 22 7c c4 9b  	umulh	x2, x1, x4
+   81484: e5 03 01 aa  	mov	x5, x1
+   81488: 42 fc 43 d3  	lsr	x2, x2, #3
+   8148c: 40 08 02 8b  	add	x0, x2, x2, lsl #2
+   81490: 20 04 00 cb  	sub	x0, x1, x0, lsl #1
+   81494: e1 03 02 aa  	mov	x1, x2
+   81498: 00 c0 00 11  	add	w0, w0, #48
+   8149c: 60 14 00 38  	strb	w0, [x3], #1
+   814a0: bf 24 00 f1  	cmp	x5, #9
+   814a4: e8 fe ff 54  	b.hi	0x81480 <ftos+0xf0>
+   814a8: e0 ff ff 17  	b	0x81428 <ftos+0x98>
+   814ac: e5 e7 02 b2  	mov	x5, #-3689348814741910324
+   814b0: 02 7d 40 93  	sxtw	x2, w8
+   814b4: e3 03 00 aa  	mov	x3, x0
+   814b8: a5 99 99 f2  	movk	x5, #52429
+   814bc: 1f 20 03 d5  	nop
+   814c0: 41 7c c5 9b  	umulh	x1, x2, x5
+   814c4: e4 03 02 aa  	mov	x4, x2
+   814c8: 21 fc 43 d3  	lsr	x1, x1, #3
+   814cc: 20 08 01 8b  	add	x0, x1, x1, lsl #2
+   814d0: 40 04 00 cb  	sub	x0, x2, x0, lsl #1
+   814d4: e2 03 01 aa  	mov	x2, x1
+   814d8: 00 c0 00 11  	add	w0, w0, #48
+   814dc: 60 14 00 38  	strb	w0, [x3], #1
+   814e0: 9f 24 00 f1  	cmp	x4, #9
+   814e4: e8 fe ff 54  	b.hi	0x814c0 <ftos+0x130>
+   814e8: e9 04 00 91  	add	x9, x7, #1
+   814ec: b4 ff ff 17  	b	0x813bc <ftos+0x2c>
+
+00000000000814f0 <htos>:
+   814f0: 23 24 00 91  	add	x3, x1, #9
+   814f4: 24 04 00 91  	add	x4, x1, #1
+   814f8: e6 06 80 52  	mov	w6, #55
+   814fc: 05 06 80 52  	mov	w5, #48
+   81500: 01 0c 00 12  	and	w1, w0, #0xf
+   81504: 00 7c 04 53  	lsr	w0, w0, #4
+   81508: 3f 24 00 71  	cmp	w1, #9
+   8150c: c2 80 85 1a  	csel	w2, w6, w5, hi
+   81510: 41 00 01 0b  	add	w1, w2, w1
+   81514: 61 f4 1f 38  	strb	w1, [x3], #-1
+   81518: 7f 00 04 eb  	cmp	x3, x4
+   8151c: 21 ff ff 54  	b.ne	0x81500 <htos+0x10>
+   81520: c0 03 5f d6  	ret
+		...
+
+0000000000081530 <print_svc_message>:
+   81530: fd 7b b6 a9  	stp	x29, x30, [sp, #-160]!
+   81534: fd 03 00 91  	mov	x29, sp
+   81538: f3 53 01 a9  	stp	x19, x20, [sp, #16]
+   8153c: f5 5b 02 a9  	stp	x21, x22, [sp, #32]
+   81540: f7 63 03 a9  	stp	x23, x24, [sp, #48]
+   81544: f9 23 00 f9  	str	x25, [sp, #64]
+   81548: 20 40 38 d5  	mrs	x0, ELR_EL1
+   8154c: 18 52 38 d5  	mrs	x24, ESR_EL1
+   81550: 02 00 00 d0  	adrp	x2, 0x83000 <print_svc_message+0x28>
+   81554: 42 a0 01 91  	add	x2, x2, #104
+   81558: f3 83 01 91  	add	x19, sp, #96
+   8155c: f4 c3 01 91  	add	x20, sp, #112
+   81560: e1 03 13 aa  	mov	x1, x19
+   81564: f6 03 02 91  	add	x22, sp, #128
+   81568: 43 00 40 f9  	ldr	x3, [x2]
+   8156c: e3 33 00 f9  	str	x3, [sp, #96]
+   81570: 42 70 40 b8  	ldur	w2, [x2, #7]
+   81574: f9 43 02 91  	add	x25, sp, #144
+   81578: e3 3b 00 f9  	str	x3, [sp, #112]
+   8157c: f7 43 01 91  	add	x23, sp, #80
+   81580: e3 43 00 f9  	str	x3, [sp, #128]
+   81584: f5 63 01 91  	add	x21, sp, #88
+   81588: e2 73 06 b8  	stur	w2, [sp, #103]
+   8158c: e2 73 07 b8  	stur	w2, [sp, #119]
+   81590: e2 73 08 b8  	stur	w2, [sp, #135]
+   81594: d7 ff ff 97  	bl	0x814f0 <htos>
+   81598: e1 03 14 aa  	mov	x1, x20
+   8159c: 00 7f 1a 53  	lsr	w0, w24, #26
+   815a0: d4 ff ff 97  	bl	0x814f0 <htos>
+   815a4: e1 03 16 aa  	mov	x1, x22
+   815a8: 00 5f 00 12  	and	w0, w24, #0xffffff
+   815ac: d1 ff ff 97  	bl	0x814f0 <htos>
+   815b0: 02 00 00 d0  	adrp	x2, 0x83000 <print_svc_message+0x88>
+   815b4: 42 60 0f 91  	add	x2, x2, #984
+   815b8: e1 03 13 aa  	mov	x1, x19
+   815bc: e0 03 19 aa  	mov	x0, x25
+   815c0: 13 00 00 d0  	adrp	x19, 0x83000 <print_svc_message+0x98>
+   815c4: 73 42 0d 91  	add	x19, x19, #848
+   815c8: 43 00 40 f9  	ldr	x3, [x2]
+   815cc: e3 4b 00 f9  	str	x3, [sp, #144]
+   815d0: 42 08 40 b9  	ldr	w2, [x2, #8]
+   815d4: e2 9b 00 b9  	str	w2, [sp, #152]
+   815d8: 36 ff ff 97  	bl	0x812b0 <string_concat>
+   815dc: e0 03 19 aa  	mov	x0, x25
+   815e0: 8c 00 00 94  	bl	0x81810 <uart_send_string>
+   815e4: e0 03 13 aa  	mov	x0, x19
+   815e8: 8a 00 00 94  	bl	0x81810 <uart_send_string>
+   815ec: 02 00 00 d0  	adrp	x2, 0x83000 <print_svc_message+0xc4>
+   815f0: 42 20 02 91  	add	x2, x2, #136
+   815f4: e1 03 14 aa  	mov	x1, x20
+   815f8: e0 03 17 aa  	mov	x0, x23
+   815fc: 43 00 40 b9  	ldr	w3, [x2]
+   81600: 42 30 40 b8  	ldur	w2, [x2, #3]
+   81604: e3 53 00 b9  	str	w3, [sp, #80]
+   81608: e2 33 05 b8  	stur	w2, [sp, #83]
+   8160c: 29 ff ff 97  	bl	0x812b0 <string_concat>
+   81610: e0 03 17 aa  	mov	x0, x23
+   81614: 7f 00 00 94  	bl	0x81810 <uart_send_string>
+   81618: e0 03 13 aa  	mov	x0, x19
+   8161c: 7d 00 00 94  	bl	0x81810 <uart_send_string>
+   81620: 22 69 8a d2  	mov	x2, #21321
+   81624: e1 03 16 aa  	mov	x1, x22
+   81628: 62 0a a4 f2  	movk	x2, #8275, lsl #16
+   8162c: e0 03 15 aa  	mov	x0, x21
+   81630: 22 6d ce f2  	movk	x2, #29545, lsl #32
+   81634: 02 04 e0 f2  	movk	x2, #32, lsl #48
+   81638: e2 2f 00 f9  	str	x2, [sp, #88]
+   8163c: 1d ff ff 97  	bl	0x812b0 <string_concat>
+   81640: e0 03 15 aa  	mov	x0, x21
+   81644: 73 00 00 94  	bl	0x81810 <uart_send_string>
+   81648: 00 00 00 d0  	adrp	x0, 0x83000 <print_svc_message+0x120>
+   8164c: 00 40 0f 91  	add	x0, x0, #976
+   81650: 70 00 00 94  	bl	0x81810 <uart_send_string>
+   81654: e0 03 13 aa  	mov	x0, x19
+   81658: 6e 00 00 94  	bl	0x81810 <uart_send_string>
+   8165c: f3 53 41 a9  	ldp	x19, x20, [sp, #16]
+   81660: f5 5b 42 a9  	ldp	x21, x22, [sp, #32]
+   81664: f7 63 43 a9  	ldp	x23, x24, [sp, #48]
+   81668: f9 23 40 f9  	ldr	x25, [sp, #64]
+   8166c: fd 7b ca a8  	ldp	x29, x30, [sp], #160
+   81670: c0 03 5f d6  	ret
+
+0000000000081674 <system_call_handler>:
+   81674: af ff ff 17  	b	0x81530 <print_svc_message>
+		...
+
+0000000000081680 <get_timestamp>:
+   81680: 00 59 a8 52  	mov	w0, #1120403456
+   81684: 00 00 27 1e  	fmov	s0, w0
+   81688: c0 03 5f d6  	ret
+   8168c: 00 00 00 00  	udf	#0
+
+0000000000081690 <uart_init>:
+   81690: fd 7b bf a9  	stp	x29, x30, [sp, #-16]!
+   81694: 01 00 00 d0  	adrp	x1, 0x83000 <uart_init+0xc>
+   81698: 02 06 82 d2  	mov	x2, #4144
+   8169c: fd 03 00 91  	mov	x29, sp
+   816a0: 21 c4 43 f9  	ldr	x1, [x1, #1928]
+   816a4: 02 e4 a7 f2  	movk	x2, #16160, lsl #16
+   816a8: 80 04 80 52  	mov	w0, #36
+   816ac: 46 00 90 52  	mov	w6, #32770
+   816b0: 5f 00 00 b9  	str	wzr, [x2]
+   816b4: 66 00 a0 72  	movk	w6, #3, lsl #16
+   816b8: 20 00 00 b9  	str	w0, [x1]
+   816bc: 85 01 80 52  	mov	w5, #12
+   816c0: 3f 04 00 b9  	str	wzr, [x1, #4]
+   816c4: 02 01 80 52  	mov	w2, #8
+   816c8: 26 08 00 b9  	str	w6, [x1, #8]
+   816cc: 44 00 80 52  	mov	w4, #2
+   816d0: 25 0c 00 b9  	str	w5, [x1, #12]
+   816d4: 03 20 81 52  	mov	w3, #2304
+   816d8: 22 10 00 b9  	str	w2, [x1, #16]
+   816dc: a3 07 a0 72  	movk	w3, #61, lsl #16
+   816e0: 24 14 00 b9  	str	w4, [x1, #20]
+   816e4: e0 03 02 2a  	mov	w0, w2
+   816e8: 23 18 00 b9  	str	w3, [x1, #24]
+   816ec: 3f 1c 00 b9  	str	wzr, [x1, #28]
+   816f0: 3f 20 00 b9  	str	wzr, [x1, #32]
+   816f4: 13 fd ff 97  	bl	0x80b40 <mbox_call>
+   816f8: 82 00 80 d2  	mov	x2, #4
+   816fc: 83 12 80 d2  	mov	x3, #148
+   81700: 02 e4 a7 f2  	movk	x2, #16160, lsl #16
+   81704: 03 e4 a7 f2  	movk	x3, #16160, lsl #16
+   81708: 04 00 84 52  	mov	w4, #8192
+   8170c: c0 12 80 52  	mov	w0, #150
+   81710: 41 00 40 b9  	ldr	w1, [x2]
+   81714: 24 00 a0 72  	movk	w4, #1, lsl #16
+   81718: 21 64 0e 12  	and	w1, w1, #0xfffc0fff
+   8171c: 21 00 04 2a  	orr	w1, w1, w4
+   81720: 41 00 00 b9  	str	w1, [x2]
+   81724: 7f 00 00 b9  	str	wzr, [x3]
+   81728: 1f 20 03 d5  	nop
+   8172c: 00 04 00 71  	subs	w0, w0, #1
+   81730: c1 ff ff 54  	b.ne	0x81728 <uart_init+0x98>
+   81734: 01 13 80 d2  	mov	x1, #152
+   81738: 02 00 98 52  	mov	w2, #49152
+   8173c: 01 e4 a7 f2  	movk	x1, #16160, lsl #16
+   81740: c0 12 80 52  	mov	w0, #150
+   81744: 22 00 00 b9  	str	w2, [x1]
+   81748: 1f 20 03 d5  	nop
+   8174c: 00 04 00 71  	subs	w0, w0, #1
+   81750: c1 ff ff 54  	b.ne	0x81748 <uart_init+0xb8>
+   81754: 02 13 80 d2  	mov	x2, #152
+   81758: 81 08 82 d2  	mov	x1, #4164
+   8175c: 02 e4 a7 f2  	movk	x2, #16160, lsl #16
+   81760: 01 e4 a7 f2  	movk	x1, #16160, lsl #16
+   81764: 80 04 82 d2  	mov	x0, #4132
+   81768: e3 ff 80 52  	mov	w3, #2047
+   8176c: 00 e4 a7 f2  	movk	x0, #16160, lsl #16
+   81770: 5f 00 00 b9  	str	wzr, [x2]
+   81774: 23 00 00 b9  	str	w3, [x1]
+   81778: 43 00 80 52  	mov	w3, #2
+   8177c: 03 00 00 b9  	str	w3, [x0]
+   81780: 63 01 80 52  	mov	w3, #11
+   81784: 43 90 0f b9  	str	w3, [x2, #3984]
+   81788: 02 0e 80 52  	mov	w2, #112
+   8178c: 22 80 1e b8  	stur	w2, [x1, #-24]
+   81790: 21 60 80 52  	mov	w1, #769
+   81794: 01 0c 00 b9  	str	w1, [x0, #12]
+   81798: fd 7b c1 a8  	ldp	x29, x30, [sp], #16
+   8179c: c0 03 5f d6  	ret
+
+00000000000817a0 <uart_send>:
+   817a0: 02 03 82 d2  	mov	x2, #4120
+   817a4: 02 e4 a7 f2  	movk	x2, #16160, lsl #16
+   817a8: 41 00 40 b9  	ldr	w1, [x2]
+   817ac: 81 00 28 36  	tbz	w1, #5, 0x817bc <uart_send+0x1c>
+   817b0: 1f 20 03 d5  	nop
+   817b4: 41 00 40 b9  	ldr	w1, [x2]
+   817b8: c1 ff 2f 37  	tbnz	w1, #5, 0x817b0 <uart_send+0x10>
+   817bc: 01 00 82 d2  	mov	x1, #4096
+   817c0: 01 e4 a7 f2  	movk	x1, #16160, lsl #16
+   817c4: 20 00 00 b9  	str	w0, [x1]
+   817c8: c0 03 5f d6  	ret
+   817cc: 1f 20 03 d5  	nop
+
+00000000000817d0 <uart_get>:
+   817d0: 01 03 82 d2  	mov	x1, #4120
+   817d4: 01 e4 a7 f2  	movk	x1, #16160, lsl #16
+   817d8: 20 00 40 b9  	ldr	w0, [x1]
+   817dc: 80 00 20 36  	tbz	w0, #4, 0x817ec <uart_get+0x1c>
+   817e0: 1f 20 03 d5  	nop
+   817e4: 20 00 40 b9  	ldr	w0, [x1]
+   817e8: c0 ff 27 37  	tbnz	w0, #4, 0x817e0 <uart_get+0x10>
+   817ec: 00 00 82 d2  	mov	x0, #4096
+   817f0: 41 01 80 52  	mov	w1, #10
+   817f4: 00 e4 a7 f2  	movk	x0, #16160, lsl #16
+   817f8: 00 00 40 b9  	ldr	w0, [x0]
+   817fc: 00 1c 00 12  	and	w0, w0, #0xff
+   81800: 1f 34 00 71  	cmp	w0, #13
+   81804: 00 10 81 1a  	csel	w0, w0, w1, ne
+   81808: c0 03 5f d6  	ret
+   8180c: 1f 20 03 d5  	nop
+
+0000000000081810 <uart_send_string>:
+   81810: 03 00 40 39  	ldrb	w3, [x0]
+   81814: e3 01 00 34  	cbz	w3, 0x81850 <uart_send_string+0x40>
+   81818: 02 03 82 d2  	mov	x2, #4120
+   8181c: 04 00 82 d2  	mov	x4, #4096
+   81820: 02 e4 a7 f2  	movk	x2, #16160, lsl #16
+   81824: 04 e4 a7 f2  	movk	x4, #16160, lsl #16
+   81828: 41 00 40 b9  	ldr	w1, [x2]
+   8182c: 00 04 00 91  	add	x0, x0, #1
+   81830: a1 00 28 36  	tbz	w1, #5, 0x81844 <uart_send_string+0x34>
+   81834: 1f 20 03 d5  	nop
+   81838: 1f 20 03 d5  	nop
+   8183c: 41 00 40 b9  	ldr	w1, [x2]
+   81840: c1 ff 2f 37  	tbnz	w1, #5, 0x81838 <uart_send_string+0x28>
+   81844: 83 00 00 b9  	str	w3, [x4]
+   81848: 03 00 40 39  	ldrb	w3, [x0]
+   8184c: e3 fe ff 35  	cbnz	w3, 0x81828 <uart_send_string+0x18>
+   81850: c0 03 5f d6  	ret
+   81854: 00 00 00 00  	udf	#0
+
+0000000000081858 <core_timer_enable>:
+   81858: 20 00 80 d2  	mov	x0, #1
+   8185c: 20 e2 1b d5  	msr	CNTP_CTL_EL0, x0
+   81860: e0 6f 40 b2  	mov	x0, #268435455
+   81864: 00 e2 1b d5  	msr	CNTP_TVAL_EL0, x0
+   81868: 40 00 80 d2  	mov	x0, #2
+   8186c: a1 00 00 58  	ldr	x1, 0x81880 <$d>
+   81870: 20 00 00 f9  	str	x0, [x1]
+
+0000000000081874 <core_timer_handler>:
+   81874: e0 6f 40 b2  	mov	x0, #268435455
+   81878: 00 e2 1b d5  	msr	CNTP_TVAL_EL0, x0
+   8187c: 00 00 00 00  	udf	#0
+
+0000000000081880 <$d>:
+   81880:	40 00 00 40	.word	0x40000040
+   81884:	00 00 00 00	.word	0x00000000
+   81888:	00 00 00 00	.word	0x00000000
+   8188c:	00 00 00 00	.word	0x00000000
+   81890:	00 00 00 00	.word	0x00000000
+   81894:	00 00 00 00	.word	0x00000000
+   81898:	00 00 00 00	.word	0x00000000
+   8189c:	00 00 00 00	.word	0x00000000
+   818a0:	00 00 00 00	.word	0x00000000
+   818a4:	00 00 00 00	.word	0x00000000
+   818a8:	00 00 00 00	.word	0x00000000
+   818ac:	00 00 00 00	.word	0x00000000
+   818b0:	00 00 00 00	.word	0x00000000
+   818b4:	00 00 00 00	.word	0x00000000
+   818b8:	00 00 00 00	.word	0x00000000
+   818bc:	00 00 00 00	.word	0x00000000
+   818c0:	00 00 00 00	.word	0x00000000
+   818c4:	00 00 00 00	.word	0x00000000
+   818c8:	00 00 00 00	.word	0x00000000
+   818cc:	00 00 00 00	.word	0x00000000
+   818d0:	00 00 00 00	.word	0x00000000
+   818d4:	00 00 00 00	.word	0x00000000
+   818d8:	00 00 00 00	.word	0x00000000
+   818dc:	00 00 00 00	.word	0x00000000
+   818e0:	00 00 00 00	.word	0x00000000
+   818e4:	00 00 00 00	.word	0x00000000
+   818e8:	00 00 00 00	.word	0x00000000
+   818ec:	00 00 00 00	.word	0x00000000
+   818f0:	00 00 00 00	.word	0x00000000
+   818f4:	00 00 00 00	.word	0x00000000
+   818f8:	00 00 00 00	.word	0x00000000
+   818fc:	00 00 00 00	.word	0x00000000
+   81900:	00 00 00 00	.word	0x00000000
+   81904:	00 00 00 00	.word	0x00000000
+   81908:	00 00 00 00	.word	0x00000000
+   8190c:	00 00 00 00	.word	0x00000000
+   81910:	00 00 00 00	.word	0x00000000
+   81914:	00 00 00 00	.word	0x00000000
+   81918:	00 00 00 00	.word	0x00000000
+   8191c:	00 00 00 00	.word	0x00000000
+   81920:	00 00 00 00	.word	0x00000000
+   81924:	00 00 00 00	.word	0x00000000
+   81928:	00 00 00 00	.word	0x00000000
+   8192c:	00 00 00 00	.word	0x00000000
+   81930:	00 00 00 00	.word	0x00000000
+   81934:	00 00 00 00	.word	0x00000000
+   81938:	00 00 00 00	.word	0x00000000
+   8193c:	00 00 00 00	.word	0x00000000
+   81940:	00 00 00 00	.word	0x00000000
+   81944:	00 00 00 00	.word	0x00000000
+   81948:	00 00 00 00	.word	0x00000000
+   8194c:	00 00 00 00	.word	0x00000000
+   81950:	00 00 00 00	.word	0x00000000
+   81954:	00 00 00 00	.word	0x00000000
+   81958:	00 00 00 00	.word	0x00000000
+   8195c:	00 00 00 00	.word	0x00000000
+   81960:	00 00 00 00	.word	0x00000000
+   81964:	00 00 00 00	.word	0x00000000
+   81968:	00 00 00 00	.word	0x00000000
+   8196c:	00 00 00 00	.word	0x00000000
+   81970:	00 00 00 00	.word	0x00000000
+   81974:	00 00 00 00	.word	0x00000000
+   81978:	00 00 00 00	.word	0x00000000
+   8197c:	00 00 00 00	.word	0x00000000
+   81980:	00 00 00 00	.word	0x00000000
+   81984:	00 00 00 00	.word	0x00000000
+   81988:	00 00 00 00	.word	0x00000000
+   8198c:	00 00 00 00	.word	0x00000000
+   81990:	00 00 00 00	.word	0x00000000
+   81994:	00 00 00 00	.word	0x00000000
+   81998:	00 00 00 00	.word	0x00000000
+   8199c:	00 00 00 00	.word	0x00000000
+   819a0:	00 00 00 00	.word	0x00000000
+   819a4:	00 00 00 00	.word	0x00000000
+   819a8:	00 00 00 00	.word	0x00000000
+   819ac:	00 00 00 00	.word	0x00000000
+   819b0:	00 00 00 00	.word	0x00000000
+   819b4:	00 00 00 00	.word	0x00000000
+   819b8:	00 00 00 00	.word	0x00000000
+   819bc:	00 00 00 00	.word	0x00000000
+   819c0:	00 00 00 00	.word	0x00000000
+   819c4:	00 00 00 00	.word	0x00000000
+   819c8:	00 00 00 00	.word	0x00000000
+   819cc:	00 00 00 00	.word	0x00000000
+   819d0:	00 00 00 00	.word	0x00000000
+   819d4:	00 00 00 00	.word	0x00000000
+   819d8:	00 00 00 00	.word	0x00000000
+   819dc:	00 00 00 00	.word	0x00000000
+   819e0:	00 00 00 00	.word	0x00000000
+   819e4:	00 00 00 00	.word	0x00000000
+   819e8:	00 00 00 00	.word	0x00000000
+   819ec:	00 00 00 00	.word	0x00000000
+   819f0:	00 00 00 00	.word	0x00000000
+   819f4:	00 00 00 00	.word	0x00000000
+   819f8:	00 00 00 00	.word	0x00000000
+   819fc:	00 00 00 00	.word	0x00000000
+   81a00:	00 00 00 00	.word	0x00000000
+   81a04:	00 00 00 00	.word	0x00000000
+   81a08:	00 00 00 00	.word	0x00000000
+   81a0c:	00 00 00 00	.word	0x00000000
+   81a10:	00 00 00 00	.word	0x00000000
+   81a14:	00 00 00 00	.word	0x00000000
+   81a18:	00 00 00 00	.word	0x00000000
+   81a1c:	00 00 00 00	.word	0x00000000
+   81a20:	00 00 00 00	.word	0x00000000
+   81a24:	00 00 00 00	.word	0x00000000
+   81a28:	00 00 00 00	.word	0x00000000
+   81a2c:	00 00 00 00	.word	0x00000000
+   81a30:	00 00 00 00	.word	0x00000000
+   81a34:	00 00 00 00	.word	0x00000000
+   81a38:	00 00 00 00	.word	0x00000000
+   81a3c:	00 00 00 00	.word	0x00000000
+   81a40:	00 00 00 00	.word	0x00000000
+   81a44:	00 00 00 00	.word	0x00000000
+   81a48:	00 00 00 00	.word	0x00000000
+   81a4c:	00 00 00 00	.word	0x00000000
+   81a50:	00 00 00 00	.word	0x00000000
+   81a54:	00 00 00 00	.word	0x00000000
+   81a58:	00 00 00 00	.word	0x00000000
+   81a5c:	00 00 00 00	.word	0x00000000
+   81a60:	00 00 00 00	.word	0x00000000
+   81a64:	00 00 00 00	.word	0x00000000
+   81a68:	00 00 00 00	.word	0x00000000
+   81a6c:	00 00 00 00	.word	0x00000000
+   81a70:	00 00 00 00	.word	0x00000000
+   81a74:	00 00 00 00	.word	0x00000000
+   81a78:	00 00 00 00	.word	0x00000000
+   81a7c:	00 00 00 00	.word	0x00000000
+   81a80:	00 00 00 00	.word	0x00000000
+   81a84:	00 00 00 00	.word	0x00000000
+   81a88:	00 00 00 00	.word	0x00000000
+   81a8c:	00 00 00 00	.word	0x00000000
+   81a90:	00 00 00 00	.word	0x00000000
+   81a94:	00 00 00 00	.word	0x00000000
+   81a98:	00 00 00 00	.word	0x00000000
+   81a9c:	00 00 00 00	.word	0x00000000
+   81aa0:	00 00 00 00	.word	0x00000000
+   81aa4:	00 00 00 00	.word	0x00000000
+   81aa8:	00 00 00 00	.word	0x00000000
+   81aac:	00 00 00 00	.word	0x00000000
+   81ab0:	00 00 00 00	.word	0x00000000
+   81ab4:	00 00 00 00	.word	0x00000000
+   81ab8:	00 00 00 00	.word	0x00000000
+   81abc:	00 00 00 00	.word	0x00000000
+   81ac0:	00 00 00 00	.word	0x00000000
+   81ac4:	00 00 00 00	.word	0x00000000
+   81ac8:	00 00 00 00	.word	0x00000000
+   81acc:	00 00 00 00	.word	0x00000000
+   81ad0:	00 00 00 00	.word	0x00000000
+   81ad4:	00 00 00 00	.word	0x00000000
+   81ad8:	00 00 00 00	.word	0x00000000
+   81adc:	00 00 00 00	.word	0x00000000
+   81ae0:	00 00 00 00	.word	0x00000000
+   81ae4:	00 00 00 00	.word	0x00000000
+   81ae8:	00 00 00 00	.word	0x00000000
+   81aec:	00 00 00 00	.word	0x00000000
+   81af0:	00 00 00 00	.word	0x00000000
+   81af4:	00 00 00 00	.word	0x00000000
+   81af8:	00 00 00 00	.word	0x00000000
+   81afc:	00 00 00 00	.word	0x00000000
+   81b00:	00 00 00 00	.word	0x00000000
+   81b04:	00 00 00 00	.word	0x00000000
+   81b08:	00 00 00 00	.word	0x00000000
+   81b0c:	00 00 00 00	.word	0x00000000
+   81b10:	00 00 00 00	.word	0x00000000
+   81b14:	00 00 00 00	.word	0x00000000
+   81b18:	00 00 00 00	.word	0x00000000
+   81b1c:	00 00 00 00	.word	0x00000000
+   81b20:	00 00 00 00	.word	0x00000000
+   81b24:	00 00 00 00	.word	0x00000000
+   81b28:	00 00 00 00	.word	0x00000000
+   81b2c:	00 00 00 00	.word	0x00000000
+   81b30:	00 00 00 00	.word	0x00000000
+   81b34:	00 00 00 00	.word	0x00000000
+   81b38:	00 00 00 00	.word	0x00000000
+   81b3c:	00 00 00 00	.word	0x00000000
+   81b40:	00 00 00 00	.word	0x00000000
+   81b44:	00 00 00 00	.word	0x00000000
+   81b48:	00 00 00 00	.word	0x00000000
+   81b4c:	00 00 00 00	.word	0x00000000
+   81b50:	00 00 00 00	.word	0x00000000
+   81b54:	00 00 00 00	.word	0x00000000
+   81b58:	00 00 00 00	.word	0x00000000
+   81b5c:	00 00 00 00	.word	0x00000000
+   81b60:	00 00 00 00	.word	0x00000000
+   81b64:	00 00 00 00	.word	0x00000000
+   81b68:	00 00 00 00	.word	0x00000000
+   81b6c:	00 00 00 00	.word	0x00000000
+   81b70:	00 00 00 00	.word	0x00000000
+   81b74:	00 00 00 00	.word	0x00000000
+   81b78:	00 00 00 00	.word	0x00000000
+   81b7c:	00 00 00 00	.word	0x00000000
+   81b80:	00 00 00 00	.word	0x00000000
+   81b84:	00 00 00 00	.word	0x00000000
+   81b88:	00 00 00 00	.word	0x00000000
+   81b8c:	00 00 00 00	.word	0x00000000
+   81b90:	00 00 00 00	.word	0x00000000
+   81b94:	00 00 00 00	.word	0x00000000
+   81b98:	00 00 00 00	.word	0x00000000
+   81b9c:	00 00 00 00	.word	0x00000000
+   81ba0:	00 00 00 00	.word	0x00000000
+   81ba4:	00 00 00 00	.word	0x00000000
+   81ba8:	00 00 00 00	.word	0x00000000
+   81bac:	00 00 00 00	.word	0x00000000
+   81bb0:	00 00 00 00	.word	0x00000000
+   81bb4:	00 00 00 00	.word	0x00000000
+   81bb8:	00 00 00 00	.word	0x00000000
+   81bbc:	00 00 00 00	.word	0x00000000
+   81bc0:	00 00 00 00	.word	0x00000000
+   81bc4:	00 00 00 00	.word	0x00000000
+   81bc8:	00 00 00 00	.word	0x00000000
+   81bcc:	00 00 00 00	.word	0x00000000
+   81bd0:	00 00 00 00	.word	0x00000000
+   81bd4:	00 00 00 00	.word	0x00000000
+   81bd8:	00 00 00 00	.word	0x00000000
+   81bdc:	00 00 00 00	.word	0x00000000
+   81be0:	00 00 00 00	.word	0x00000000
+   81be4:	00 00 00 00	.word	0x00000000
+   81be8:	00 00 00 00	.word	0x00000000
+   81bec:	00 00 00 00	.word	0x00000000
+   81bf0:	00 00 00 00	.word	0x00000000
+   81bf4:	00 00 00 00	.word	0x00000000
+   81bf8:	00 00 00 00	.word	0x00000000
+   81bfc:	00 00 00 00	.word	0x00000000
+   81c00:	00 00 00 00	.word	0x00000000
+   81c04:	00 00 00 00	.word	0x00000000
+   81c08:	00 00 00 00	.word	0x00000000
+   81c0c:	00 00 00 00	.word	0x00000000
+   81c10:	00 00 00 00	.word	0x00000000
+   81c14:	00 00 00 00	.word	0x00000000
+   81c18:	00 00 00 00	.word	0x00000000
+   81c1c:	00 00 00 00	.word	0x00000000
+   81c20:	00 00 00 00	.word	0x00000000
+   81c24:	00 00 00 00	.word	0x00000000
+   81c28:	00 00 00 00	.word	0x00000000
+   81c2c:	00 00 00 00	.word	0x00000000
+   81c30:	00 00 00 00	.word	0x00000000
+   81c34:	00 00 00 00	.word	0x00000000
+   81c38:	00 00 00 00	.word	0x00000000
+   81c3c:	00 00 00 00	.word	0x00000000
+   81c40:	00 00 00 00	.word	0x00000000
+   81c44:	00 00 00 00	.word	0x00000000
+   81c48:	00 00 00 00	.word	0x00000000
+   81c4c:	00 00 00 00	.word	0x00000000
+   81c50:	00 00 00 00	.word	0x00000000
+   81c54:	00 00 00 00	.word	0x00000000
+   81c58:	00 00 00 00	.word	0x00000000
+   81c5c:	00 00 00 00	.word	0x00000000
+   81c60:	00 00 00 00	.word	0x00000000
+   81c64:	00 00 00 00	.word	0x00000000
+   81c68:	00 00 00 00	.word	0x00000000
+   81c6c:	00 00 00 00	.word	0x00000000
+   81c70:	00 00 00 00	.word	0x00000000
+   81c74:	00 00 00 00	.word	0x00000000
+   81c78:	00 00 00 00	.word	0x00000000
+   81c7c:	00 00 00 00	.word	0x00000000
+   81c80:	00 00 00 00	.word	0x00000000
+   81c84:	00 00 00 00	.word	0x00000000
+   81c88:	00 00 00 00	.word	0x00000000
+   81c8c:	00 00 00 00	.word	0x00000000
+   81c90:	00 00 00 00	.word	0x00000000
+   81c94:	00 00 00 00	.word	0x00000000
+   81c98:	00 00 00 00	.word	0x00000000
+   81c9c:	00 00 00 00	.word	0x00000000
+   81ca0:	00 00 00 00	.word	0x00000000
+   81ca4:	00 00 00 00	.word	0x00000000
+   81ca8:	00 00 00 00	.word	0x00000000
+   81cac:	00 00 00 00	.word	0x00000000
+   81cb0:	00 00 00 00	.word	0x00000000
+   81cb4:	00 00 00 00	.word	0x00000000
+   81cb8:	00 00 00 00	.word	0x00000000
+   81cbc:	00 00 00 00	.word	0x00000000
+   81cc0:	00 00 00 00	.word	0x00000000
+   81cc4:	00 00 00 00	.word	0x00000000
+   81cc8:	00 00 00 00	.word	0x00000000
+   81ccc:	00 00 00 00	.word	0x00000000
+   81cd0:	00 00 00 00	.word	0x00000000
+   81cd4:	00 00 00 00	.word	0x00000000
+   81cd8:	00 00 00 00	.word	0x00000000
+   81cdc:	00 00 00 00	.word	0x00000000
+   81ce0:	00 00 00 00	.word	0x00000000
+   81ce4:	00 00 00 00	.word	0x00000000
+   81ce8:	00 00 00 00	.word	0x00000000
+   81cec:	00 00 00 00	.word	0x00000000
+   81cf0:	00 00 00 00	.word	0x00000000
+   81cf4:	00 00 00 00	.word	0x00000000
+   81cf8:	00 00 00 00	.word	0x00000000
+   81cfc:	00 00 00 00	.word	0x00000000
+   81d00:	00 00 00 00	.word	0x00000000
+   81d04:	00 00 00 00	.word	0x00000000
+   81d08:	00 00 00 00	.word	0x00000000
+   81d0c:	00 00 00 00	.word	0x00000000
+   81d10:	00 00 00 00	.word	0x00000000
+   81d14:	00 00 00 00	.word	0x00000000
+   81d18:	00 00 00 00	.word	0x00000000
+   81d1c:	00 00 00 00	.word	0x00000000
+   81d20:	00 00 00 00	.word	0x00000000
+   81d24:	00 00 00 00	.word	0x00000000
+   81d28:	00 00 00 00	.word	0x00000000
+   81d2c:	00 00 00 00	.word	0x00000000
+   81d30:	00 00 00 00	.word	0x00000000
+   81d34:	00 00 00 00	.word	0x00000000
+   81d38:	00 00 00 00	.word	0x00000000
+   81d3c:	00 00 00 00	.word	0x00000000
+   81d40:	00 00 00 00	.word	0x00000000
+   81d44:	00 00 00 00	.word	0x00000000
+   81d48:	00 00 00 00	.word	0x00000000
+   81d4c:	00 00 00 00	.word	0x00000000
+   81d50:	00 00 00 00	.word	0x00000000
+   81d54:	00 00 00 00	.word	0x00000000
+   81d58:	00 00 00 00	.word	0x00000000
+   81d5c:	00 00 00 00	.word	0x00000000
+   81d60:	00 00 00 00	.word	0x00000000
+   81d64:	00 00 00 00	.word	0x00000000
+   81d68:	00 00 00 00	.word	0x00000000
+   81d6c:	00 00 00 00	.word	0x00000000
+   81d70:	00 00 00 00	.word	0x00000000
+   81d74:	00 00 00 00	.word	0x00000000
+   81d78:	00 00 00 00	.word	0x00000000
+   81d7c:	00 00 00 00	.word	0x00000000
+   81d80:	00 00 00 00	.word	0x00000000
+   81d84:	00 00 00 00	.word	0x00000000
+   81d88:	00 00 00 00	.word	0x00000000
+   81d8c:	00 00 00 00	.word	0x00000000
+   81d90:	00 00 00 00	.word	0x00000000
+   81d94:	00 00 00 00	.word	0x00000000
+   81d98:	00 00 00 00	.word	0x00000000
+   81d9c:	00 00 00 00	.word	0x00000000
+   81da0:	00 00 00 00	.word	0x00000000
+   81da4:	00 00 00 00	.word	0x00000000
+   81da8:	00 00 00 00	.word	0x00000000
+   81dac:	00 00 00 00	.word	0x00000000
+   81db0:	00 00 00 00	.word	0x00000000
+   81db4:	00 00 00 00	.word	0x00000000
+   81db8:	00 00 00 00	.word	0x00000000
+   81dbc:	00 00 00 00	.word	0x00000000
+   81dc0:	00 00 00 00	.word	0x00000000
+   81dc4:	00 00 00 00	.word	0x00000000
+   81dc8:	00 00 00 00	.word	0x00000000
+   81dcc:	00 00 00 00	.word	0x00000000
+   81dd0:	00 00 00 00	.word	0x00000000
+   81dd4:	00 00 00 00	.word	0x00000000
+   81dd8:	00 00 00 00	.word	0x00000000
+   81ddc:	00 00 00 00	.word	0x00000000
+   81de0:	00 00 00 00	.word	0x00000000
+   81de4:	00 00 00 00	.word	0x00000000
+   81de8:	00 00 00 00	.word	0x00000000
+   81dec:	00 00 00 00	.word	0x00000000
+   81df0:	00 00 00 00	.word	0x00000000
+   81df4:	00 00 00 00	.word	0x00000000
+   81df8:	00 00 00 00	.word	0x00000000
+   81dfc:	00 00 00 00	.word	0x00000000
+   81e00:	00 00 00 00	.word	0x00000000
+   81e04:	00 00 00 00	.word	0x00000000
+   81e08:	00 00 00 00	.word	0x00000000
+   81e0c:	00 00 00 00	.word	0x00000000
+   81e10:	00 00 00 00	.word	0x00000000
+   81e14:	00 00 00 00	.word	0x00000000
+   81e18:	00 00 00 00	.word	0x00000000
+   81e1c:	00 00 00 00	.word	0x00000000
+   81e20:	00 00 00 00	.word	0x00000000
+   81e24:	00 00 00 00	.word	0x00000000
+   81e28:	00 00 00 00	.word	0x00000000
+   81e2c:	00 00 00 00	.word	0x00000000
+   81e30:	00 00 00 00	.word	0x00000000
+   81e34:	00 00 00 00	.word	0x00000000
+   81e38:	00 00 00 00	.word	0x00000000
+   81e3c:	00 00 00 00	.word	0x00000000
+   81e40:	00 00 00 00	.word	0x00000000
+   81e44:	00 00 00 00	.word	0x00000000
+   81e48:	00 00 00 00	.word	0x00000000
+   81e4c:	00 00 00 00	.word	0x00000000
+   81e50:	00 00 00 00	.word	0x00000000
+   81e54:	00 00 00 00	.word	0x00000000
+   81e58:	00 00 00 00	.word	0x00000000
+   81e5c:	00 00 00 00	.word	0x00000000
+   81e60:	00 00 00 00	.word	0x00000000
+   81e64:	00 00 00 00	.word	0x00000000
+   81e68:	00 00 00 00	.word	0x00000000
+   81e6c:	00 00 00 00	.word	0x00000000
+   81e70:	00 00 00 00	.word	0x00000000
+   81e74:	00 00 00 00	.word	0x00000000
+   81e78:	00 00 00 00	.word	0x00000000
+   81e7c:	00 00 00 00	.word	0x00000000
+   81e80:	00 00 00 00	.word	0x00000000
+   81e84:	00 00 00 00	.word	0x00000000
+   81e88:	00 00 00 00	.word	0x00000000
+   81e8c:	00 00 00 00	.word	0x00000000
+   81e90:	00 00 00 00	.word	0x00000000
+   81e94:	00 00 00 00	.word	0x00000000
+   81e98:	00 00 00 00	.word	0x00000000
+   81e9c:	00 00 00 00	.word	0x00000000
+   81ea0:	00 00 00 00	.word	0x00000000
+   81ea4:	00 00 00 00	.word	0x00000000
+   81ea8:	00 00 00 00	.word	0x00000000
+   81eac:	00 00 00 00	.word	0x00000000
+   81eb0:	00 00 00 00	.word	0x00000000
+   81eb4:	00 00 00 00	.word	0x00000000
+   81eb8:	00 00 00 00	.word	0x00000000
+   81ebc:	00 00 00 00	.word	0x00000000
+   81ec0:	00 00 00 00	.word	0x00000000
+   81ec4:	00 00 00 00	.word	0x00000000
+   81ec8:	00 00 00 00	.word	0x00000000
+   81ecc:	00 00 00 00	.word	0x00000000
+   81ed0:	00 00 00 00	.word	0x00000000
+   81ed4:	00 00 00 00	.word	0x00000000
+   81ed8:	00 00 00 00	.word	0x00000000
+   81edc:	00 00 00 00	.word	0x00000000
+   81ee0:	00 00 00 00	.word	0x00000000
+   81ee4:	00 00 00 00	.word	0x00000000
+   81ee8:	00 00 00 00	.word	0x00000000
+   81eec:	00 00 00 00	.word	0x00000000
+   81ef0:	00 00 00 00	.word	0x00000000
+   81ef4:	00 00 00 00	.word	0x00000000
+   81ef8:	00 00 00 00	.word	0x00000000
+   81efc:	00 00 00 00	.word	0x00000000
+   81f00:	00 00 00 00	.word	0x00000000
+   81f04:	00 00 00 00	.word	0x00000000
+   81f08:	00 00 00 00	.word	0x00000000
+   81f0c:	00 00 00 00	.word	0x00000000
+   81f10:	00 00 00 00	.word	0x00000000
+   81f14:	00 00 00 00	.word	0x00000000
+   81f18:	00 00 00 00	.word	0x00000000
+   81f1c:	00 00 00 00	.word	0x00000000
+   81f20:	00 00 00 00	.word	0x00000000
+   81f24:	00 00 00 00	.word	0x00000000
+   81f28:	00 00 00 00	.word	0x00000000
+   81f2c:	00 00 00 00	.word	0x00000000
+   81f30:	00 00 00 00	.word	0x00000000
+   81f34:	00 00 00 00	.word	0x00000000
+   81f38:	00 00 00 00	.word	0x00000000
+   81f3c:	00 00 00 00	.word	0x00000000
+   81f40:	00 00 00 00	.word	0x00000000
+   81f44:	00 00 00 00	.word	0x00000000
+   81f48:	00 00 00 00	.word	0x00000000
+   81f4c:	00 00 00 00	.word	0x00000000
+   81f50:	00 00 00 00	.word	0x00000000
+   81f54:	00 00 00 00	.word	0x00000000
+   81f58:	00 00 00 00	.word	0x00000000
+   81f5c:	00 00 00 00	.word	0x00000000
+   81f60:	00 00 00 00	.word	0x00000000
+   81f64:	00 00 00 00	.word	0x00000000
+   81f68:	00 00 00 00	.word	0x00000000
+   81f6c:	00 00 00 00	.word	0x00000000
+   81f70:	00 00 00 00	.word	0x00000000
+   81f74:	00 00 00 00	.word	0x00000000
+   81f78:	00 00 00 00	.word	0x00000000
+   81f7c:	00 00 00 00	.word	0x00000000
+   81f80:	00 00 00 00	.word	0x00000000
+   81f84:	00 00 00 00	.word	0x00000000
+   81f88:	00 00 00 00	.word	0x00000000
+   81f8c:	00 00 00 00	.word	0x00000000
+   81f90:	00 00 00 00	.word	0x00000000
+   81f94:	00 00 00 00	.word	0x00000000
+   81f98:	00 00 00 00	.word	0x00000000
+   81f9c:	00 00 00 00	.word	0x00000000
+   81fa0:	00 00 00 00	.word	0x00000000
+   81fa4:	00 00 00 00	.word	0x00000000
+   81fa8:	00 00 00 00	.word	0x00000000
+   81fac:	00 00 00 00	.word	0x00000000
+   81fb0:	00 00 00 00	.word	0x00000000
+   81fb4:	00 00 00 00	.word	0x00000000
+   81fb8:	00 00 00 00	.word	0x00000000
+   81fbc:	00 00 00 00	.word	0x00000000
+   81fc0:	00 00 00 00	.word	0x00000000
+   81fc4:	00 00 00 00	.word	0x00000000
+   81fc8:	00 00 00 00	.word	0x00000000
+   81fcc:	00 00 00 00	.word	0x00000000
+   81fd0:	00 00 00 00	.word	0x00000000
+   81fd4:	00 00 00 00	.word	0x00000000
+   81fd8:	00 00 00 00	.word	0x00000000
+   81fdc:	00 00 00 00	.word	0x00000000
+   81fe0:	00 00 00 00	.word	0x00000000
+   81fe4:	00 00 00 00	.word	0x00000000
+   81fe8:	00 00 00 00	.word	0x00000000
+   81fec:	00 00 00 00	.word	0x00000000
+   81ff0:	00 00 00 00	.word	0x00000000
+   81ff4:	00 00 00 00	.word	0x00000000
+   81ff8:	00 00 00 00	.word	0x00000000
+   81ffc:	00 00 00 00	.word	0x00000000
+
+0000000000082000 <load_all>:
+   82000: e0 07 40 a9  	ldp	x0, x1, [sp]
+   82004: e2 0f 41 a9  	ldp	x2, x3, [sp, #16]
+   82008: e4 17 42 a9  	ldp	x4, x5, [sp, #32]
+   8200c: e6 1f 43 a9  	ldp	x6, x7, [sp, #48]
+   82010: e8 27 44 a9  	ldp	x8, x9, [sp, #64]
+   82014: ea 2f 45 a9  	ldp	x10, x11, [sp, #80]
+   82018: ec 37 46 a9  	ldp	x12, x13, [sp, #96]
+   8201c: ee 3f 47 a9  	ldp	x14, x15, [sp, #112]
+   82020: f0 47 48 a9  	ldp	x16, x17, [sp, #128]
+   82024: f2 4f 49 a9  	ldp	x18, x19, [sp, #144]
+   82028: f4 57 4a a9  	ldp	x20, x21, [sp, #160]
+   8202c: f6 5f 4b a9  	ldp	x22, x23, [sp, #176]
+   82030: f8 67 4c a9  	ldp	x24, x25, [sp, #192]
+   82034: fa 6f 4d a9  	ldp	x26, x27, [sp, #208]
+   82038: fc 77 4e a9  	ldp	x28, x29, [sp, #224]
+   8203c: fe 7b 40 f9  	ldr	x30, [sp, #240]
+   82040: ff 03 04 91  	add	sp, sp, #256
+   82044: e0 03 9f d6  	eret
+   82048: 1f 20 03 d5  	nop
+   8204c: 1f 20 03 d5  	nop
+   82050: 1f 20 03 d5  	nop
+   82054: 1f 20 03 d5  	nop
+   82058: 1f 20 03 d5  	nop
+   8205c: 1f 20 03 d5  	nop
+   82060: 1f 20 03 d5  	nop
+   82064: 1f 20 03 d5  	nop
+   82068: 1f 20 03 d5  	nop
+   8206c: 1f 20 03 d5  	nop
+   82070: 1f 20 03 d5  	nop
+   82074: 1f 20 03 d5  	nop
+   82078: 1f 20 03 d5  	nop
+   8207c: 1f 20 03 d5  	nop
+   82080: 1f 20 03 d5  	nop
+   82084: 1f 20 03 d5  	nop
+   82088: 1f 20 03 d5  	nop
+   8208c: 1f 20 03 d5  	nop
+   82090: 1f 20 03 d5  	nop
+   82094: 1f 20 03 d5  	nop
+   82098: 1f 20 03 d5  	nop
+   8209c: 1f 20 03 d5  	nop
+   820a0: 1f 20 03 d5  	nop
+   820a4: 1f 20 03 d5  	nop
+   820a8: 1f 20 03 d5  	nop
+   820ac: 1f 20 03 d5  	nop
+   820b0: 1f 20 03 d5  	nop
+   820b4: 1f 20 03 d5  	nop
+   820b8: 1f 20 03 d5  	nop
+   820bc: 1f 20 03 d5  	nop
+   820c0: 1f 20 03 d5  	nop
+   820c4: 1f 20 03 d5  	nop
+   820c8: 1f 20 03 d5  	nop
+   820cc: 1f 20 03 d5  	nop
+   820d0: 1f 20 03 d5  	nop
+   820d4: 1f 20 03 d5  	nop
+   820d8: 1f 20 03 d5  	nop
+   820dc: 1f 20 03 d5  	nop
+   820e0: 1f 20 03 d5  	nop
+   820e4: 1f 20 03 d5  	nop
+   820e8: 1f 20 03 d5  	nop
+   820ec: 1f 20 03 d5  	nop
+   820f0: 1f 20 03 d5  	nop
+   820f4: 1f 20 03 d5  	nop
+   820f8: 1f 20 03 d5  	nop
+   820fc: 1f 20 03 d5  	nop
+   82100: 1f 20 03 d5  	nop
+   82104: 1f 20 03 d5  	nop
+   82108: 1f 20 03 d5  	nop
+   8210c: 1f 20 03 d5  	nop
+   82110: 1f 20 03 d5  	nop
+   82114: 1f 20 03 d5  	nop
+   82118: 1f 20 03 d5  	nop
+   8211c: 1f 20 03 d5  	nop
+   82120: 1f 20 03 d5  	nop
+   82124: 1f 20 03 d5  	nop
+   82128: 1f 20 03 d5  	nop
+   8212c: 1f 20 03 d5  	nop
+   82130: 1f 20 03 d5  	nop
+   82134: 1f 20 03 d5  	nop
+   82138: 1f 20 03 d5  	nop
+   8213c: 1f 20 03 d5  	nop
+   82140: 1f 20 03 d5  	nop
+   82144: 1f 20 03 d5  	nop
+   82148: 1f 20 03 d5  	nop
+   8214c: 1f 20 03 d5  	nop
+   82150: 1f 20 03 d5  	nop
+   82154: 1f 20 03 d5  	nop
+   82158: 1f 20 03 d5  	nop
+   8215c: 1f 20 03 d5  	nop
+   82160: 1f 20 03 d5  	nop
+   82164: 1f 20 03 d5  	nop
+   82168: 1f 20 03 d5  	nop
+   8216c: 1f 20 03 d5  	nop
+   82170: 1f 20 03 d5  	nop
+   82174: 1f 20 03 d5  	nop
+   82178: 1f 20 03 d5  	nop
+   8217c: 1f 20 03 d5  	nop
+   82180: 1f 20 03 d5  	nop
+   82184: 1f 20 03 d5  	nop
+   82188: 1f 20 03 d5  	nop
+   8218c: 1f 20 03 d5  	nop
+   82190: 1f 20 03 d5  	nop
+   82194: 1f 20 03 d5  	nop
+   82198: 1f 20 03 d5  	nop
+   8219c: 1f 20 03 d5  	nop
+   821a0: 1f 20 03 d5  	nop
+   821a4: 1f 20 03 d5  	nop
+   821a8: 1f 20 03 d5  	nop
+   821ac: 1f 20 03 d5  	nop
+   821b0: 1f 20 03 d5  	nop
+   821b4: 1f 20 03 d5  	nop
+   821b8: 1f 20 03 d5  	nop
+   821bc: 1f 20 03 d5  	nop
+   821c0: 1f 20 03 d5  	nop
+   821c4: 1f 20 03 d5  	nop
+   821c8: 1f 20 03 d5  	nop
+   821cc: 1f 20 03 d5  	nop
+   821d0: 1f 20 03 d5  	nop
+   821d4: 1f 20 03 d5  	nop
+   821d8: 1f 20 03 d5  	nop
+   821dc: 1f 20 03 d5  	nop
+   821e0: 1f 20 03 d5  	nop
+   821e4: 1f 20 03 d5  	nop
+   821e8: 1f 20 03 d5  	nop
+   821ec: 1f 20 03 d5  	nop
+   821f0: 1f 20 03 d5  	nop
+   821f4: 1f 20 03 d5  	nop
+   821f8: 1f 20 03 d5  	nop
+   821fc: 1f 20 03 d5  	nop
+   82200: 1f 20 03 d5  	nop
+   82204: 1f 20 03 d5  	nop
+   82208: 1f 20 03 d5  	nop
+   8220c: 1f 20 03 d5  	nop
+   82210: 1f 20 03 d5  	nop
+   82214: 1f 20 03 d5  	nop
+   82218: 1f 20 03 d5  	nop
+   8221c: 1f 20 03 d5  	nop
+   82220: 1f 20 03 d5  	nop
+   82224: 1f 20 03 d5  	nop
+   82228: 1f 20 03 d5  	nop
+   8222c: 1f 20 03 d5  	nop
+   82230: 1f 20 03 d5  	nop
+   82234: 1f 20 03 d5  	nop
+   82238: 1f 20 03 d5  	nop
+   8223c: 1f 20 03 d5  	nop
+   82240: 1f 20 03 d5  	nop
+   82244: 1f 20 03 d5  	nop
+   82248: 1f 20 03 d5  	nop
+   8224c: 1f 20 03 d5  	nop
+   82250: 1f 20 03 d5  	nop
+   82254: 1f 20 03 d5  	nop
+   82258: 1f 20 03 d5  	nop
+   8225c: 1f 20 03 d5  	nop
+   82260: 1f 20 03 d5  	nop
+   82264: 1f 20 03 d5  	nop
+   82268: 1f 20 03 d5  	nop
+   8226c: 1f 20 03 d5  	nop
+   82270: 1f 20 03 d5  	nop
+   82274: 1f 20 03 d5  	nop
+   82278: 1f 20 03 d5  	nop
+   8227c: 1f 20 03 d5  	nop
+   82280: 1f 20 03 d5  	nop
+   82284: 1f 20 03 d5  	nop
+   82288: 1f 20 03 d5  	nop
+   8228c: 1f 20 03 d5  	nop
+   82290: 1f 20 03 d5  	nop
+   82294: 1f 20 03 d5  	nop
+   82298: 1f 20 03 d5  	nop
+   8229c: 1f 20 03 d5  	nop
+   822a0: 1f 20 03 d5  	nop
+   822a4: 1f 20 03 d5  	nop
+   822a8: 1f 20 03 d5  	nop
+   822ac: 1f 20 03 d5  	nop
+   822b0: 1f 20 03 d5  	nop
+   822b4: 1f 20 03 d5  	nop
+   822b8: 1f 20 03 d5  	nop
+   822bc: 1f 20 03 d5  	nop
+   822c0: 1f 20 03 d5  	nop
+   822c4: 1f 20 03 d5  	nop
+   822c8: 1f 20 03 d5  	nop
+   822cc: 1f 20 03 d5  	nop
+   822d0: 1f 20 03 d5  	nop
+   822d4: 1f 20 03 d5  	nop
+   822d8: 1f 20 03 d5  	nop
+   822dc: 1f 20 03 d5  	nop
+   822e0: 1f 20 03 d5  	nop
+   822e4: 1f 20 03 d5  	nop
+   822e8: 1f 20 03 d5  	nop
+   822ec: 1f 20 03 d5  	nop
+   822f0: 1f 20 03 d5  	nop
+   822f4: 1f 20 03 d5  	nop
+   822f8: 1f 20 03 d5  	nop
+   822fc: 1f 20 03 d5  	nop
+   82300: 1f 20 03 d5  	nop
+   82304: 1f 20 03 d5  	nop
+   82308: 1f 20 03 d5  	nop
+   8230c: 1f 20 03 d5  	nop
+   82310: 1f 20 03 d5  	nop
+   82314: 1f 20 03 d5  	nop
+   82318: 1f 20 03 d5  	nop
+   8231c: 1f 20 03 d5  	nop
+   82320: 1f 20 03 d5  	nop
+   82324: 1f 20 03 d5  	nop
+   82328: 1f 20 03 d5  	nop
+   8232c: 1f 20 03 d5  	nop
+   82330: 1f 20 03 d5  	nop
+   82334: 1f 20 03 d5  	nop
+   82338: 1f 20 03 d5  	nop
+   8233c: 1f 20 03 d5  	nop
+   82340: 1f 20 03 d5  	nop
+   82344: 1f 20 03 d5  	nop
+   82348: 1f 20 03 d5  	nop
+   8234c: 1f 20 03 d5  	nop
+   82350: 1f 20 03 d5  	nop
+   82354: 1f 20 03 d5  	nop
+   82358: 1f 20 03 d5  	nop
+   8235c: 1f 20 03 d5  	nop
+   82360: 1f 20 03 d5  	nop
+   82364: 1f 20 03 d5  	nop
+   82368: 1f 20 03 d5  	nop
+   8236c: 1f 20 03 d5  	nop
+   82370: 1f 20 03 d5  	nop
+   82374: 1f 20 03 d5  	nop
+   82378: 1f 20 03 d5  	nop
+   8237c: 1f 20 03 d5  	nop
+   82380: 1f 20 03 d5  	nop
+   82384: 1f 20 03 d5  	nop
+   82388: 1f 20 03 d5  	nop
+   8238c: 1f 20 03 d5  	nop
+   82390: 1f 20 03 d5  	nop
+   82394: 1f 20 03 d5  	nop
+   82398: 1f 20 03 d5  	nop
+   8239c: 1f 20 03 d5  	nop
+   823a0: 1f 20 03 d5  	nop
+   823a4: 1f 20 03 d5  	nop
+   823a8: 1f 20 03 d5  	nop
+   823ac: 1f 20 03 d5  	nop
+   823b0: 1f 20 03 d5  	nop
+   823b4: 1f 20 03 d5  	nop
+   823b8: 1f 20 03 d5  	nop
+   823bc: 1f 20 03 d5  	nop
+   823c0: 1f 20 03 d5  	nop
+   823c4: 1f 20 03 d5  	nop
+   823c8: 1f 20 03 d5  	nop
+   823cc: 1f 20 03 d5  	nop
+   823d0: 1f 20 03 d5  	nop
+   823d4: 1f 20 03 d5  	nop
+   823d8: 1f 20 03 d5  	nop
+   823dc: 1f 20 03 d5  	nop
+   823e0: 1f 20 03 d5  	nop
+   823e4: 1f 20 03 d5  	nop
+   823e8: 1f 20 03 d5  	nop
+   823ec: 1f 20 03 d5  	nop
+   823f0: 1f 20 03 d5  	nop
+   823f4: 1f 20 03 d5  	nop
+   823f8: 1f 20 03 d5  	nop
+   823fc: 1f 20 03 d5  	nop
+   82400: 1f 20 03 d5  	nop
+   82404: 1f 20 03 d5  	nop
+   82408: 1f 20 03 d5  	nop
+   8240c: 1f 20 03 d5  	nop
+   82410: 1f 20 03 d5  	nop
+   82414: 1f 20 03 d5  	nop
+   82418: 1f 20 03 d5  	nop
+   8241c: 1f 20 03 d5  	nop
+   82420: 1f 20 03 d5  	nop
+   82424: 1f 20 03 d5  	nop
+   82428: 1f 20 03 d5  	nop
+   8242c: 1f 20 03 d5  	nop
+   82430: 1f 20 03 d5  	nop
+   82434: 1f 20 03 d5  	nop
+   82438: 1f 20 03 d5  	nop
+   8243c: 1f 20 03 d5  	nop
+   82440: 1f 20 03 d5  	nop
+   82444: 1f 20 03 d5  	nop
+   82448: 1f 20 03 d5  	nop
+   8244c: 1f 20 03 d5  	nop
+   82450: 1f 20 03 d5  	nop
+   82454: 1f 20 03 d5  	nop
+   82458: 1f 20 03 d5  	nop
+   8245c: 1f 20 03 d5  	nop
+   82460: 1f 20 03 d5  	nop
+   82464: 1f 20 03 d5  	nop
+   82468: 1f 20 03 d5  	nop
+   8246c: 1f 20 03 d5  	nop
+   82470: 1f 20 03 d5  	nop
+   82474: 1f 20 03 d5  	nop
+   82478: 1f 20 03 d5  	nop
+   8247c: 1f 20 03 d5  	nop
+   82480: 1f 20 03 d5  	nop
+   82484: 1f 20 03 d5  	nop
+   82488: 1f 20 03 d5  	nop
+   8248c: 1f 20 03 d5  	nop
+   82490: 1f 20 03 d5  	nop
+   82494: 1f 20 03 d5  	nop
+   82498: 1f 20 03 d5  	nop
+   8249c: 1f 20 03 d5  	nop
+   824a0: 1f 20 03 d5  	nop
+   824a4: 1f 20 03 d5  	nop
+   824a8: 1f 20 03 d5  	nop
+   824ac: 1f 20 03 d5  	nop
+   824b0: 1f 20 03 d5  	nop
+   824b4: 1f 20 03 d5  	nop
+   824b8: 1f 20 03 d5  	nop
+   824bc: 1f 20 03 d5  	nop
+   824c0: 1f 20 03 d5  	nop
+   824c4: 1f 20 03 d5  	nop
+   824c8: 1f 20 03 d5  	nop
+   824cc: 1f 20 03 d5  	nop
+   824d0: 1f 20 03 d5  	nop
+   824d4: 1f 20 03 d5  	nop
+   824d8: 1f 20 03 d5  	nop
+   824dc: 1f 20 03 d5  	nop
+   824e0: 1f 20 03 d5  	nop
+   824e4: 1f 20 03 d5  	nop
+   824e8: 1f 20 03 d5  	nop
+   824ec: 1f 20 03 d5  	nop
+   824f0: 1f 20 03 d5  	nop
+   824f4: 1f 20 03 d5  	nop
+   824f8: 1f 20 03 d5  	nop
+   824fc: 1f 20 03 d5  	nop
+   82500: 1f 20 03 d5  	nop
+   82504: 1f 20 03 d5  	nop
+   82508: 1f 20 03 d5  	nop
+   8250c: 1f 20 03 d5  	nop
+   82510: 1f 20 03 d5  	nop
+   82514: 1f 20 03 d5  	nop
+   82518: 1f 20 03 d5  	nop
+   8251c: 1f 20 03 d5  	nop
+   82520: 1f 20 03 d5  	nop
+   82524: 1f 20 03 d5  	nop
+   82528: 1f 20 03 d5  	nop
+   8252c: 1f 20 03 d5  	nop
+   82530: 1f 20 03 d5  	nop
+   82534: 1f 20 03 d5  	nop
+   82538: 1f 20 03 d5  	nop
+   8253c: 1f 20 03 d5  	nop
+   82540: 1f 20 03 d5  	nop
+   82544: 1f 20 03 d5  	nop
+   82548: 1f 20 03 d5  	nop
+   8254c: 1f 20 03 d5  	nop
+   82550: 1f 20 03 d5  	nop
+   82554: 1f 20 03 d5  	nop
+   82558: 1f 20 03 d5  	nop
+   8255c: 1f 20 03 d5  	nop
+   82560: 1f 20 03 d5  	nop
+   82564: 1f 20 03 d5  	nop
+   82568: 1f 20 03 d5  	nop
+   8256c: 1f 20 03 d5  	nop
+   82570: 1f 20 03 d5  	nop
+   82574: 1f 20 03 d5  	nop
+   82578: 1f 20 03 d5  	nop
+   8257c: 1f 20 03 d5  	nop
+   82580: 1f 20 03 d5  	nop
+   82584: 1f 20 03 d5  	nop
+   82588: 1f 20 03 d5  	nop
+   8258c: 1f 20 03 d5  	nop
+   82590: 1f 20 03 d5  	nop
+   82594: 1f 20 03 d5  	nop
+   82598: 1f 20 03 d5  	nop
+   8259c: 1f 20 03 d5  	nop
+   825a0: 1f 20 03 d5  	nop
+   825a4: 1f 20 03 d5  	nop
+   825a8: 1f 20 03 d5  	nop
+   825ac: 1f 20 03 d5  	nop
+   825b0: 1f 20 03 d5  	nop
+   825b4: 1f 20 03 d5  	nop
+   825b8: 1f 20 03 d5  	nop
+   825bc: 1f 20 03 d5  	nop
+   825c0: 1f 20 03 d5  	nop
+   825c4: 1f 20 03 d5  	nop
+   825c8: 1f 20 03 d5  	nop
+   825cc: 1f 20 03 d5  	nop
+   825d0: 1f 20 03 d5  	nop
+   825d4: 1f 20 03 d5  	nop
+   825d8: 1f 20 03 d5  	nop
+   825dc: 1f 20 03 d5  	nop
+   825e0: 1f 20 03 d5  	nop
+   825e4: 1f 20 03 d5  	nop
+   825e8: 1f 20 03 d5  	nop
+   825ec: 1f 20 03 d5  	nop
+   825f0: 1f 20 03 d5  	nop
+   825f4: 1f 20 03 d5  	nop
+   825f8: 1f 20 03 d5  	nop
+   825fc: 1f 20 03 d5  	nop
+   82600: 1f 20 03 d5  	nop
+   82604: 1f 20 03 d5  	nop
+   82608: 1f 20 03 d5  	nop
+   8260c: 1f 20 03 d5  	nop
+   82610: 1f 20 03 d5  	nop
+   82614: 1f 20 03 d5  	nop
+   82618: 1f 20 03 d5  	nop
+   8261c: 1f 20 03 d5  	nop
+   82620: 1f 20 03 d5  	nop
+   82624: 1f 20 03 d5  	nop
+   82628: 1f 20 03 d5  	nop
+   8262c: 1f 20 03 d5  	nop
+   82630: 1f 20 03 d5  	nop
+   82634: 1f 20 03 d5  	nop
+   82638: 1f 20 03 d5  	nop
+   8263c: 1f 20 03 d5  	nop
+   82640: 1f 20 03 d5  	nop
+   82644: 1f 20 03 d5  	nop
+   82648: 1f 20 03 d5  	nop
+   8264c: 1f 20 03 d5  	nop
+   82650: 1f 20 03 d5  	nop
+   82654: 1f 20 03 d5  	nop
+   82658: 1f 20 03 d5  	nop
+   8265c: 1f 20 03 d5  	nop
+   82660: 1f 20 03 d5  	nop
+   82664: 1f 20 03 d5  	nop
+   82668: 1f 20 03 d5  	nop
+   8266c: 1f 20 03 d5  	nop
+   82670: 1f 20 03 d5  	nop
+   82674: 1f 20 03 d5  	nop
+   82678: 1f 20 03 d5  	nop
+   8267c: 1f 20 03 d5  	nop
+   82680: 1f 20 03 d5  	nop
+   82684: 1f 20 03 d5  	nop
+   82688: 1f 20 03 d5  	nop
+   8268c: 1f 20 03 d5  	nop
+   82690: 1f 20 03 d5  	nop
+   82694: 1f 20 03 d5  	nop
+   82698: 1f 20 03 d5  	nop
+   8269c: 1f 20 03 d5  	nop
+   826a0: 1f 20 03 d5  	nop
+   826a4: 1f 20 03 d5  	nop
+   826a8: 1f 20 03 d5  	nop
+   826ac: 1f 20 03 d5  	nop
+   826b0: 1f 20 03 d5  	nop
+   826b4: 1f 20 03 d5  	nop
+   826b8: 1f 20 03 d5  	nop
+   826bc: 1f 20 03 d5  	nop
+   826c0: 1f 20 03 d5  	nop
+   826c4: 1f 20 03 d5  	nop
+   826c8: 1f 20 03 d5  	nop
+   826cc: 1f 20 03 d5  	nop
+   826d0: 1f 20 03 d5  	nop
+   826d4: 1f 20 03 d5  	nop
+   826d8: 1f 20 03 d5  	nop
+   826dc: 1f 20 03 d5  	nop
+   826e0: 1f 20 03 d5  	nop
+   826e4: 1f 20 03 d5  	nop
+   826e8: 1f 20 03 d5  	nop
+   826ec: 1f 20 03 d5  	nop
+   826f0: 1f 20 03 d5  	nop
+   826f4: 1f 20 03 d5  	nop
+   826f8: 1f 20 03 d5  	nop
+   826fc: 1f 20 03 d5  	nop
+   82700: 1f 20 03 d5  	nop
+   82704: 1f 20 03 d5  	nop
+   82708: 1f 20 03 d5  	nop
+   8270c: 1f 20 03 d5  	nop
+   82710: 1f 20 03 d5  	nop
+   82714: 1f 20 03 d5  	nop
+   82718: 1f 20 03 d5  	nop
+   8271c: 1f 20 03 d5  	nop
+   82720: 1f 20 03 d5  	nop
+   82724: 1f 20 03 d5  	nop
+   82728: 1f 20 03 d5  	nop
+   8272c: 1f 20 03 d5  	nop
+   82730: 1f 20 03 d5  	nop
+   82734: 1f 20 03 d5  	nop
+   82738: 1f 20 03 d5  	nop
+   8273c: 1f 20 03 d5  	nop
+   82740: 1f 20 03 d5  	nop
+   82744: 1f 20 03 d5  	nop
+   82748: 1f 20 03 d5  	nop
+   8274c: 1f 20 03 d5  	nop
+   82750: 1f 20 03 d5  	nop
+   82754: 1f 20 03 d5  	nop
+   82758: 1f 20 03 d5  	nop
+   8275c: 1f 20 03 d5  	nop
+   82760: 1f 20 03 d5  	nop
+   82764: 1f 20 03 d5  	nop
+   82768: 1f 20 03 d5  	nop
+   8276c: 1f 20 03 d5  	nop
+   82770: 1f 20 03 d5  	nop
+   82774: 1f 20 03 d5  	nop
+   82778: 1f 20 03 d5  	nop
+   8277c: 1f 20 03 d5  	nop
+   82780: 1f 20 03 d5  	nop
+   82784: 1f 20 03 d5  	nop
+   82788: 1f 20 03 d5  	nop
+   8278c: 1f 20 03 d5  	nop
+   82790: 1f 20 03 d5  	nop
+   82794: 1f 20 03 d5  	nop
+   82798: 1f 20 03 d5  	nop
+   8279c: 1f 20 03 d5  	nop
+   827a0: 1f 20 03 d5  	nop
+   827a4: 1f 20 03 d5  	nop
+   827a8: 1f 20 03 d5  	nop
+   827ac: 1f 20 03 d5  	nop
+   827b0: 1f 20 03 d5  	nop
+   827b4: 1f 20 03 d5  	nop
+   827b8: 1f 20 03 d5  	nop
+   827bc: 1f 20 03 d5  	nop
+   827c0: 1f 20 03 d5  	nop
+   827c4: 1f 20 03 d5  	nop
+   827c8: 1f 20 03 d5  	nop
+   827cc: 1f 20 03 d5  	nop
+   827d0: 1f 20 03 d5  	nop
+   827d4: 1f 20 03 d5  	nop
+   827d8: 1f 20 03 d5  	nop
+   827dc: 1f 20 03 d5  	nop
+   827e0: 1f 20 03 d5  	nop
+   827e4: 1f 20 03 d5  	nop
+   827e8: 1f 20 03 d5  	nop
+   827ec: 1f 20 03 d5  	nop
+   827f0: 1f 20 03 d5  	nop
+   827f4: 1f 20 03 d5  	nop
+   827f8: 1f 20 03 d5  	nop
+   827fc: 1f 20 03 d5  	nop
+
+0000000000082800 <exception_table>:
+   82800: 00 f8 ff 17  	b	0x80800 <exception_handler>
+   82804: 1f 20 03 d5  	nop
+   82808: 1f 20 03 d5  	nop
+   8280c: 1f 20 03 d5  	nop
+   82810: 1f 20 03 d5  	nop
+   82814: 1f 20 03 d5  	nop
+   82818: 1f 20 03 d5  	nop
+   8281c: 1f 20 03 d5  	nop
+   82820: 1f 20 03 d5  	nop
+   82824: 1f 20 03 d5  	nop
+   82828: 1f 20 03 d5  	nop
+   8282c: 1f 20 03 d5  	nop
+   82830: 1f 20 03 d5  	nop
+   82834: 1f 20 03 d5  	nop
+   82838: 1f 20 03 d5  	nop
+   8283c: 1f 20 03 d5  	nop
+   82840: 1f 20 03 d5  	nop
+   82844: 1f 20 03 d5  	nop
+   82848: 1f 20 03 d5  	nop
+   8284c: 1f 20 03 d5  	nop
+   82850: 1f 20 03 d5  	nop
+   82854: 1f 20 03 d5  	nop
+   82858: 1f 20 03 d5  	nop
+   8285c: 1f 20 03 d5  	nop
+   82860: 1f 20 03 d5  	nop
+   82864: 1f 20 03 d5  	nop
+   82868: 1f 20 03 d5  	nop
+   8286c: 1f 20 03 d5  	nop
+   82870: 1f 20 03 d5  	nop
+   82874: 1f 20 03 d5  	nop
+   82878: 1f 20 03 d5  	nop
+   8287c: 1f 20 03 d5  	nop
+   82880: e0 f7 ff 17  	b	0x80800 <exception_handler>
+   82884: 1f 20 03 d5  	nop
+   82888: 1f 20 03 d5  	nop
+   8288c: 1f 20 03 d5  	nop
+   82890: 1f 20 03 d5  	nop
+   82894: 1f 20 03 d5  	nop
+   82898: 1f 20 03 d5  	nop
+   8289c: 1f 20 03 d5  	nop
+   828a0: 1f 20 03 d5  	nop
+   828a4: 1f 20 03 d5  	nop
+   828a8: 1f 20 03 d5  	nop
+   828ac: 1f 20 03 d5  	nop
+   828b0: 1f 20 03 d5  	nop
+   828b4: 1f 20 03 d5  	nop
+   828b8: 1f 20 03 d5  	nop
+   828bc: 1f 20 03 d5  	nop
+   828c0: 1f 20 03 d5  	nop
+   828c4: 1f 20 03 d5  	nop
+   828c8: 1f 20 03 d5  	nop
+   828cc: 1f 20 03 d5  	nop
+   828d0: 1f 20 03 d5  	nop
+   828d4: 1f 20 03 d5  	nop
+   828d8: 1f 20 03 d5  	nop
+   828dc: 1f 20 03 d5  	nop
+   828e0: 1f 20 03 d5  	nop
+   828e4: 1f 20 03 d5  	nop
+   828e8: 1f 20 03 d5  	nop
+   828ec: 1f 20 03 d5  	nop
+   828f0: 1f 20 03 d5  	nop
+   828f4: 1f 20 03 d5  	nop
+   828f8: 1f 20 03 d5  	nop
+   828fc: 1f 20 03 d5  	nop
+   82900: c0 f7 ff 17  	b	0x80800 <exception_handler>
+   82904: 1f 20 03 d5  	nop
+   82908: 1f 20 03 d5  	nop
+   8290c: 1f 20 03 d5  	nop
+   82910: 1f 20 03 d5  	nop
+   82914: 1f 20 03 d5  	nop
+   82918: 1f 20 03 d5  	nop
+   8291c: 1f 20 03 d5  	nop
+   82920: 1f 20 03 d5  	nop
+   82924: 1f 20 03 d5  	nop
+   82928: 1f 20 03 d5  	nop
+   8292c: 1f 20 03 d5  	nop
+   82930: 1f 20 03 d5  	nop
+   82934: 1f 20 03 d5  	nop
+   82938: 1f 20 03 d5  	nop
+   8293c: 1f 20 03 d5  	nop
+   82940: 1f 20 03 d5  	nop
+   82944: 1f 20 03 d5  	nop
+   82948: 1f 20 03 d5  	nop
+   8294c: 1f 20 03 d5  	nop
+   82950: 1f 20 03 d5  	nop
+   82954: 1f 20 03 d5  	nop
+   82958: 1f 20 03 d5  	nop
+   8295c: 1f 20 03 d5  	nop
+   82960: 1f 20 03 d5  	nop
+   82964: 1f 20 03 d5  	nop
+   82968: 1f 20 03 d5  	nop
+   8296c: 1f 20 03 d5  	nop
+   82970: 1f 20 03 d5  	nop
+   82974: 1f 20 03 d5  	nop
+   82978: 1f 20 03 d5  	nop
+   8297c: 1f 20 03 d5  	nop
+   82980: a0 f7 ff 17  	b	0x80800 <exception_handler>
+   82984: 1f 20 03 d5  	nop
+   82988: 1f 20 03 d5  	nop
+   8298c: 1f 20 03 d5  	nop
+   82990: 1f 20 03 d5  	nop
+   82994: 1f 20 03 d5  	nop
+   82998: 1f 20 03 d5  	nop
+   8299c: 1f 20 03 d5  	nop
+   829a0: 1f 20 03 d5  	nop
+   829a4: 1f 20 03 d5  	nop
+   829a8: 1f 20 03 d5  	nop
+   829ac: 1f 20 03 d5  	nop
+   829b0: 1f 20 03 d5  	nop
+   829b4: 1f 20 03 d5  	nop
+   829b8: 1f 20 03 d5  	nop
+   829bc: 1f 20 03 d5  	nop
+   829c0: 1f 20 03 d5  	nop
+   829c4: 1f 20 03 d5  	nop
+   829c8: 1f 20 03 d5  	nop
+   829cc: 1f 20 03 d5  	nop
+   829d0: 1f 20 03 d5  	nop
+   829d4: 1f 20 03 d5  	nop
+   829d8: 1f 20 03 d5  	nop
+   829dc: 1f 20 03 d5  	nop
+   829e0: 1f 20 03 d5  	nop
+   829e4: 1f 20 03 d5  	nop
+   829e8: 1f 20 03 d5  	nop
+   829ec: 1f 20 03 d5  	nop
+   829f0: 1f 20 03 d5  	nop
+   829f4: 1f 20 03 d5  	nop
+   829f8: 1f 20 03 d5  	nop
+   829fc: 1f 20 03 d5  	nop
+   82a00: ff 03 04 d1  	sub	sp, sp, #256
+   82a04: e0 07 00 a9  	stp	x0, x1, [sp]
+   82a08: e2 0f 01 a9  	stp	x2, x3, [sp, #16]
+   82a0c: e4 17 02 a9  	stp	x4, x5, [sp, #32]
+   82a10: e6 1f 03 a9  	stp	x6, x7, [sp, #48]
+   82a14: e8 27 04 a9  	stp	x8, x9, [sp, #64]
+   82a18: ea 2f 05 a9  	stp	x10, x11, [sp, #80]
+   82a1c: ec 37 06 a9  	stp	x12, x13, [sp, #96]
+   82a20: ee 3f 07 a9  	stp	x14, x15, [sp, #112]
+   82a24: f0 47 08 a9  	stp	x16, x17, [sp, #128]
+   82a28: f2 4f 09 a9  	stp	x18, x19, [sp, #144]
+   82a2c: f4 57 0a a9  	stp	x20, x21, [sp, #160]
+   82a30: f6 5f 0b a9  	stp	x22, x23, [sp, #176]
+   82a34: f8 67 0c a9  	stp	x24, x25, [sp, #192]
+   82a38: fa 6f 0d a9  	stp	x26, x27, [sp, #208]
+   82a3c: fc 77 0e a9  	stp	x28, x29, [sp, #224]
+   82a40: fe 7b 00 f9  	str	x30, [sp, #240]
+   82a44: 0c fb ff 17  	b	0x81674 <system_call_handler>
+   82a48: 6e fd ff 17  	b	0x82000 <load_all>
+   82a4c: 1f 20 03 d5  	nop
+   82a50: 1f 20 03 d5  	nop
+   82a54: 1f 20 03 d5  	nop
+   82a58: 1f 20 03 d5  	nop
+   82a5c: 1f 20 03 d5  	nop
+   82a60: 1f 20 03 d5  	nop
+   82a64: 1f 20 03 d5  	nop
+   82a68: 1f 20 03 d5  	nop
+   82a6c: 1f 20 03 d5  	nop
+   82a70: 1f 20 03 d5  	nop
+   82a74: 1f 20 03 d5  	nop
+   82a78: 1f 20 03 d5  	nop
+   82a7c: 1f 20 03 d5  	nop
+   82a80: 60 f7 ff 17  	b	0x80800 <exception_handler>
+   82a84: 1f 20 03 d5  	nop
+   82a88: 1f 20 03 d5  	nop
+   82a8c: 1f 20 03 d5  	nop
+   82a90: 1f 20 03 d5  	nop
+   82a94: 1f 20 03 d5  	nop
+   82a98: 1f 20 03 d5  	nop
+   82a9c: 1f 20 03 d5  	nop
+   82aa0: 1f 20 03 d5  	nop
+   82aa4: 1f 20 03 d5  	nop
+   82aa8: 1f 20 03 d5  	nop
+   82aac: 1f 20 03 d5  	nop
+   82ab0: 1f 20 03 d5  	nop
+   82ab4: 1f 20 03 d5  	nop
+   82ab8: 1f 20 03 d5  	nop
+   82abc: 1f 20 03 d5  	nop
+   82ac0: 1f 20 03 d5  	nop
+   82ac4: 1f 20 03 d5  	nop
+   82ac8: 1f 20 03 d5  	nop
+   82acc: 1f 20 03 d5  	nop
+   82ad0: 1f 20 03 d5  	nop
+   82ad4: 1f 20 03 d5  	nop
+   82ad8: 1f 20 03 d5  	nop
+   82adc: 1f 20 03 d5  	nop
+   82ae0: 1f 20 03 d5  	nop
+   82ae4: 1f 20 03 d5  	nop
+   82ae8: 1f 20 03 d5  	nop
+   82aec: 1f 20 03 d5  	nop
+   82af0: 1f 20 03 d5  	nop
+   82af4: 1f 20 03 d5  	nop
+   82af8: 1f 20 03 d5  	nop
+   82afc: 1f 20 03 d5  	nop
+   82b00: 40 f7 ff 17  	b	0x80800 <exception_handler>
+   82b04: 1f 20 03 d5  	nop
+   82b08: 1f 20 03 d5  	nop
+   82b0c: 1f 20 03 d5  	nop
+   82b10: 1f 20 03 d5  	nop
+   82b14: 1f 20 03 d5  	nop
+   82b18: 1f 20 03 d5  	nop
+   82b1c: 1f 20 03 d5  	nop
+   82b20: 1f 20 03 d5  	nop
+   82b24: 1f 20 03 d5  	nop
+   82b28: 1f 20 03 d5  	nop
+   82b2c: 1f 20 03 d5  	nop
+   82b30: 1f 20 03 d5  	nop
+   82b34: 1f 20 03 d5  	nop
+   82b38: 1f 20 03 d5  	nop
+   82b3c: 1f 20 03 d5  	nop
+   82b40: 1f 20 03 d5  	nop
+   82b44: 1f 20 03 d5  	nop
+   82b48: 1f 20 03 d5  	nop
+   82b4c: 1f 20 03 d5  	nop
+   82b50: 1f 20 03 d5  	nop
+   82b54: 1f 20 03 d5  	nop
+   82b58: 1f 20 03 d5  	nop
+   82b5c: 1f 20 03 d5  	nop
+   82b60: 1f 20 03 d5  	nop
+   82b64: 1f 20 03 d5  	nop
+   82b68: 1f 20 03 d5  	nop
+   82b6c: 1f 20 03 d5  	nop
+   82b70: 1f 20 03 d5  	nop
+   82b74: 1f 20 03 d5  	nop
+   82b78: 1f 20 03 d5  	nop
+   82b7c: 1f 20 03 d5  	nop
+   82b80: ff 03 04 d1  	sub	sp, sp, #256
+   82b84: e0 07 00 a9  	stp	x0, x1, [sp]
+   82b88: e2 0f 01 a9  	stp	x2, x3, [sp, #16]
+   82b8c: e4 17 02 a9  	stp	x4, x5, [sp, #32]
+   82b90: e6 1f 03 a9  	stp	x6, x7, [sp, #48]
+   82b94: e8 27 04 a9  	stp	x8, x9, [sp, #64]
+   82b98: ea 2f 05 a9  	stp	x10, x11, [sp, #80]
+   82b9c: ec 37 06 a9  	stp	x12, x13, [sp, #96]
+   82ba0: ee 3f 07 a9  	stp	x14, x15, [sp, #112]
+   82ba4: f0 47 08 a9  	stp	x16, x17, [sp, #128]
+   82ba8: f2 4f 09 a9  	stp	x18, x19, [sp, #144]
+   82bac: f4 57 0a a9  	stp	x20, x21, [sp, #160]
+   82bb0: f6 5f 0b a9  	stp	x22, x23, [sp, #176]
+   82bb4: f8 67 0c a9  	stp	x24, x25, [sp, #192]
+   82bb8: fa 6f 0d a9  	stp	x26, x27, [sp, #208]
+   82bbc: fc 77 0e a9  	stp	x28, x29, [sp, #224]
+   82bc0: fe 7b 00 f9  	str	x30, [sp, #240]
+   82bc4: 73 f7 ff 17  	b	0x80990 <hello_handler>
+   82bc8: 12 f7 ff 17  	b	0x80810 <sp_exception_handler>
+   82bcc: 0d fd ff 17  	b	0x82000 <load_all>
+   82bd0: 1f 20 03 d5  	nop
+   82bd4: 1f 20 03 d5  	nop
+   82bd8: 1f 20 03 d5  	nop
+   82bdc: 1f 20 03 d5  	nop
+   82be0: 1f 20 03 d5  	nop
+   82be4: 1f 20 03 d5  	nop
+   82be8: 1f 20 03 d5  	nop
+   82bec: 1f 20 03 d5  	nop
+   82bf0: 1f 20 03 d5  	nop
+   82bf4: 1f 20 03 d5  	nop
+   82bf8: 1f 20 03 d5  	nop
+   82bfc: 1f 20 03 d5  	nop
+   82c00: 64 f7 ff 17  	b	0x80990 <hello_handler>
+   82c04: ff 03 04 d1  	sub	sp, sp, #256
+   82c08: e0 07 00 a9  	stp	x0, x1, [sp]
+   82c0c: e2 0f 01 a9  	stp	x2, x3, [sp, #16]
+   82c10: e4 17 02 a9  	stp	x4, x5, [sp, #32]
+   82c14: e6 1f 03 a9  	stp	x6, x7, [sp, #48]
+   82c18: e8 27 04 a9  	stp	x8, x9, [sp, #64]
+   82c1c: ea 2f 05 a9  	stp	x10, x11, [sp, #80]
+   82c20: ec 37 06 a9  	stp	x12, x13, [sp, #96]
+   82c24: ee 3f 07 a9  	stp	x14, x15, [sp, #112]
+   82c28: f0 47 08 a9  	stp	x16, x17, [sp, #128]
+   82c2c: f2 4f 09 a9  	stp	x18, x19, [sp, #144]
+   82c30: f4 57 0a a9  	stp	x20, x21, [sp, #160]
+   82c34: f6 5f 0b a9  	stp	x22, x23, [sp, #176]
+   82c38: f8 67 0c a9  	stp	x24, x25, [sp, #192]
+   82c3c: fa 6f 0d a9  	stp	x26, x27, [sp, #208]
+   82c40: fc 77 0e a9  	stp	x28, x29, [sp, #224]
+   82c44: fe 7b 00 f9  	str	x30, [sp, #240]
+   82c48: 8b fa ff 17  	b	0x81674 <system_call_handler>
+   82c4c: ed fc ff 17  	b	0x82000 <load_all>
+   82c50: e0 03 9f d6  	eret
+   82c54: 1f 20 03 d5  	nop
+   82c58: 1f 20 03 d5  	nop
+   82c5c: 1f 20 03 d5  	nop
+   82c60: 1f 20 03 d5  	nop
+   82c64: 1f 20 03 d5  	nop
+   82c68: 1f 20 03 d5  	nop
+   82c6c: 1f 20 03 d5  	nop
+   82c70: 1f 20 03 d5  	nop
+   82c74: 1f 20 03 d5  	nop
+   82c78: 1f 20 03 d5  	nop
+   82c7c: 1f 20 03 d5  	nop
+   82c80: e0 f6 ff 17  	b	0x80800 <exception_handler>
+   82c84: 1f 20 03 d5  	nop
+   82c88: 1f 20 03 d5  	nop
+   82c8c: 1f 20 03 d5  	nop
+   82c90: 1f 20 03 d5  	nop
+   82c94: 1f 20 03 d5  	nop
+   82c98: 1f 20 03 d5  	nop
+   82c9c: 1f 20 03 d5  	nop
+   82ca0: 1f 20 03 d5  	nop
+   82ca4: 1f 20 03 d5  	nop
+   82ca8: 1f 20 03 d5  	nop
+   82cac: 1f 20 03 d5  	nop
+   82cb0: 1f 20 03 d5  	nop
+   82cb4: 1f 20 03 d5  	nop
+   82cb8: 1f 20 03 d5  	nop
+   82cbc: 1f 20 03 d5  	nop
+   82cc0: 1f 20 03 d5  	nop
+   82cc4: 1f 20 03 d5  	nop
+   82cc8: 1f 20 03 d5  	nop
+   82ccc: 1f 20 03 d5  	nop
+   82cd0: 1f 20 03 d5  	nop
+   82cd4: 1f 20 03 d5  	nop
+   82cd8: 1f 20 03 d5  	nop
+   82cdc: 1f 20 03 d5  	nop
+   82ce0: 1f 20 03 d5  	nop
+   82ce4: 1f 20 03 d5  	nop
+   82ce8: 1f 20 03 d5  	nop
+   82cec: 1f 20 03 d5  	nop
+   82cf0: 1f 20 03 d5  	nop
+   82cf4: 1f 20 03 d5  	nop
+   82cf8: 1f 20 03 d5  	nop
+   82cfc: 1f 20 03 d5  	nop
+   82d00: c0 f6 ff 17  	b	0x80800 <exception_handler>
+   82d04: 1f 20 03 d5  	nop
+   82d08: 1f 20 03 d5  	nop
+   82d0c: 1f 20 03 d5  	nop
+   82d10: 1f 20 03 d5  	nop
+   82d14: 1f 20 03 d5  	nop
+   82d18: 1f 20 03 d5  	nop
+   82d1c: 1f 20 03 d5  	nop
+   82d20: 1f 20 03 d5  	nop
+   82d24: 1f 20 03 d5  	nop
+   82d28: 1f 20 03 d5  	nop
+   82d2c: 1f 20 03 d5  	nop
+   82d30: 1f 20 03 d5  	nop
+   82d34: 1f 20 03 d5  	nop
+   82d38: 1f 20 03 d5  	nop
+   82d3c: 1f 20 03 d5  	nop
+   82d40: 1f 20 03 d5  	nop
+   82d44: 1f 20 03 d5  	nop
+   82d48: 1f 20 03 d5  	nop
+   82d4c: 1f 20 03 d5  	nop
+   82d50: 1f 20 03 d5  	nop
+   82d54: 1f 20 03 d5  	nop
+   82d58: 1f 20 03 d5  	nop
+   82d5c: 1f 20 03 d5  	nop
+   82d60: 1f 20 03 d5  	nop
+   82d64: 1f 20 03 d5  	nop
+   82d68: 1f 20 03 d5  	nop
+   82d6c: 1f 20 03 d5  	nop
+   82d70: 1f 20 03 d5  	nop
+   82d74: 1f 20 03 d5  	nop
+   82d78: 1f 20 03 d5  	nop
+   82d7c: 1f 20 03 d5  	nop
+   82d80: a0 f6 ff 17  	b	0x80800 <exception_handler>
+   82d84: 1f 20 03 d5  	nop
+   82d88: 1f 20 03 d5  	nop
+   82d8c: 1f 20 03 d5  	nop
+   82d90: 1f 20 03 d5  	nop
+   82d94: 1f 20 03 d5  	nop
+   82d98: 1f 20 03 d5  	nop
+   82d9c: 1f 20 03 d5  	nop
+   82da0: 1f 20 03 d5  	nop
+   82da4: 1f 20 03 d5  	nop
+   82da8: 1f 20 03 d5  	nop
+   82dac: 1f 20 03 d5  	nop
+   82db0: 1f 20 03 d5  	nop
+   82db4: 1f 20 03 d5  	nop
+   82db8: 1f 20 03 d5  	nop
+   82dbc: 1f 20 03 d5  	nop
+   82dc0: 1f 20 03 d5  	nop
+   82dc4: 1f 20 03 d5  	nop
+   82dc8: 1f 20 03 d5  	nop
+   82dcc: 1f 20 03 d5  	nop
+   82dd0: 1f 20 03 d5  	nop
+   82dd4: 1f 20 03 d5  	nop
+   82dd8: 1f 20 03 d5  	nop
+   82ddc: 1f 20 03 d5  	nop
+   82de0: 1f 20 03 d5  	nop
+   82de4: 1f 20 03 d5  	nop
+   82de8: 1f 20 03 d5  	nop
+   82dec: 1f 20 03 d5  	nop
+   82df0: 1f 20 03 d5  	nop
+   82df4: 1f 20 03 d5  	nop
+   82df8: 1f 20 03 d5  	nop
+   82dfc: 1f 20 03 d5  	nop
+   82e00: 80 f6 ff 17  	b	0x80800 <exception_handler>
+   82e04: 1f 20 03 d5  	nop
+   82e08: 1f 20 03 d5  	nop
+   82e0c: 1f 20 03 d5  	nop
+   82e10: 1f 20 03 d5  	nop
+   82e14: 1f 20 03 d5  	nop
+   82e18: 1f 20 03 d5  	nop
+   82e1c: 1f 20 03 d5  	nop
+   82e20: 1f 20 03 d5  	nop
+   82e24: 1f 20 03 d5  	nop
+   82e28: 1f 20 03 d5  	nop
+   82e2c: 1f 20 03 d5  	nop
+   82e30: 1f 20 03 d5  	nop
+   82e34: 1f 20 03 d5  	nop
+   82e38: 1f 20 03 d5  	nop
+   82e3c: 1f 20 03 d5  	nop
+   82e40: 1f 20 03 d5  	nop
+   82e44: 1f 20 03 d5  	nop
+   82e48: 1f 20 03 d5  	nop
+   82e4c: 1f 20 03 d5  	nop
+   82e50: 1f 20 03 d5  	nop
+   82e54: 1f 20 03 d5  	nop
+   82e58: 1f 20 03 d5  	nop
+   82e5c: 1f 20 03 d5  	nop
+   82e60: 1f 20 03 d5  	nop
+   82e64: 1f 20 03 d5  	nop
+   82e68: 1f 20 03 d5  	nop
+   82e6c: 1f 20 03 d5  	nop
+   82e70: 1f 20 03 d5  	nop
+   82e74: 1f 20 03 d5  	nop
+   82e78: 1f 20 03 d5  	nop
+   82e7c: 1f 20 03 d5  	nop
+   82e80: 60 f6 ff 17  	b	0x80800 <exception_handler>
+   82e84: 1f 20 03 d5  	nop
+   82e88: 1f 20 03 d5  	nop
+   82e8c: 1f 20 03 d5  	nop
+   82e90: 1f 20 03 d5  	nop
+   82e94: 1f 20 03 d5  	nop
+   82e98: 1f 20 03 d5  	nop
+   82e9c: 1f 20 03 d5  	nop
+   82ea0: 1f 20 03 d5  	nop
+   82ea4: 1f 20 03 d5  	nop
+   82ea8: 1f 20 03 d5  	nop
+   82eac: 1f 20 03 d5  	nop
+   82eb0: 1f 20 03 d5  	nop
+   82eb4: 1f 20 03 d5  	nop
+   82eb8: 1f 20 03 d5  	nop
+   82ebc: 1f 20 03 d5  	nop
+   82ec0: 1f 20 03 d5  	nop
+   82ec4: 1f 20 03 d5  	nop
+   82ec8: 1f 20 03 d5  	nop
+   82ecc: 1f 20 03 d5  	nop
+   82ed0: 1f 20 03 d5  	nop
+   82ed4: 1f 20 03 d5  	nop
+   82ed8: 1f 20 03 d5  	nop
+   82edc: 1f 20 03 d5  	nop
+   82ee0: 1f 20 03 d5  	nop
+   82ee4: 1f 20 03 d5  	nop
+   82ee8: 1f 20 03 d5  	nop
+   82eec: 1f 20 03 d5  	nop
+   82ef0: 1f 20 03 d5  	nop
+   82ef4: 1f 20 03 d5  	nop
+   82ef8: 1f 20 03 d5  	nop
+   82efc: 1f 20 03 d5  	nop
+   82f00: 40 f6 ff 17  	b	0x80800 <exception_handler>
+   82f04: 1f 20 03 d5  	nop
+   82f08: 1f 20 03 d5  	nop
+   82f0c: 1f 20 03 d5  	nop
+   82f10: 1f 20 03 d5  	nop
+   82f14: 1f 20 03 d5  	nop
+   82f18: 1f 20 03 d5  	nop
+   82f1c: 1f 20 03 d5  	nop
+   82f20: 1f 20 03 d5  	nop
+   82f24: 1f 20 03 d5  	nop
+   82f28: 1f 20 03 d5  	nop
+   82f2c: 1f 20 03 d5  	nop
+   82f30: 1f 20 03 d5  	nop
+   82f34: 1f 20 03 d5  	nop
+   82f38: 1f 20 03 d5  	nop
+   82f3c: 1f 20 03 d5  	nop
+   82f40: 1f 20 03 d5  	nop
+   82f44: 1f 20 03 d5  	nop
+   82f48: 1f 20 03 d5  	nop
+   82f4c: 1f 20 03 d5  	nop
+   82f50: 1f 20 03 d5  	nop
+   82f54: 1f 20 03 d5  	nop
+   82f58: 1f 20 03 d5  	nop
+   82f5c: 1f 20 03 d5  	nop
+   82f60: 1f 20 03 d5  	nop
+   82f64: 1f 20 03 d5  	nop
+   82f68: 1f 20 03 d5  	nop
+   82f6c: 1f 20 03 d5  	nop
+   82f70: 1f 20 03 d5  	nop
+   82f74: 1f 20 03 d5  	nop
+   82f78: 1f 20 03 d5  	nop
+   82f7c: 1f 20 03 d5  	nop
+   82f80: 20 f6 ff 17  	b	0x80800 <exception_handler>
+   82f84: 1f 20 03 d5  	nop
+   82f88: 1f 20 03 d5  	nop
+   82f8c: 1f 20 03 d5  	nop
+   82f90: 1f 20 03 d5  	nop
+   82f94: 1f 20 03 d5  	nop
+   82f98: 1f 20 03 d5  	nop
+   82f9c: 1f 20 03 d5  	nop
+   82fa0: 1f 20 03 d5  	nop
+   82fa4: 1f 20 03 d5  	nop
+   82fa8: 1f 20 03 d5  	nop
+   82fac: 1f 20 03 d5  	nop
+   82fb0: 1f 20 03 d5  	nop
+   82fb4: 1f 20 03 d5  	nop
+   82fb8: 1f 20 03 d5  	nop
+   82fbc: 1f 20 03 d5  	nop
+   82fc0: 1f 20 03 d5  	nop
+   82fc4: 1f 20 03 d5  	nop
+   82fc8: 1f 20 03 d5  	nop
+   82fcc: 1f 20 03 d5  	nop
+   82fd0: 1f 20 03 d5  	nop
+   82fd4: 1f 20 03 d5  	nop
+   82fd8: 1f 20 03 d5  	nop
+   82fdc: 1f 20 03 d5  	nop
+   82fe0: 1f 20 03 d5  	nop
+   82fe4: 1f 20 03 d5  	nop
+   82fe8: 1f 20 03 d5  	nop
+   82fec: 1f 20 03 d5  	nop
+   82ff0: 1f 20 03 d5  	nop
+   82ff4: 1f 20 03 d5  	nop
+   82ff8: 1f 20 03 d5  	nop
+   82ffc: 1f 20 03 d5  	nop
+
+Disassembly of section .text.startup:
+
+0000000000083000 <main>:
+   83000: fd 7b bf a9  	stp	x29, x30, [sp, #-16]!
+   83004: fd 03 00 91  	mov	x29, sp
+   83008: a2 f9 ff 97  	bl	0x81690 <uart_init>
+   8300c: 00 00 00 90  	adrp	x0, 0x83000 <main+0xc>
+   83010: 00 60 02 91  	add	x0, x0, #152
+   83014: ff f9 ff 97  	bl	0x81810 <uart_send_string>
+   83018: 00 00 00 90  	adrp	x0, 0x83000 <main+0x18>
+   8301c: 00 e0 02 91  	add	x0, x0, #184
+   83020: fc f9 ff 97  	bl	0x81810 <uart_send_string>
+   83024: fd 7b c1 a8  	ldp	x29, x30, [sp], #16
+   83028: 63 f8 ff 17  	b	0x811b4 <shell_run>

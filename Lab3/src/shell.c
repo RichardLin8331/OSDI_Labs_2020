@@ -22,6 +22,8 @@ int parse_command(char* cmd) {
     else if (strcmp(cmd, "vc_base") == 0) return 5;
     else if (strcmp(cmd, "svc_test") == 0) return 6;
     else if (strcmp(cmd, "brk_test") == 0) return 7;
+    else if (strcmp(cmd, "irq") == 0) return 8;
+    else if (strcmp(cmd, "daif") == 0) return 9;
     return -1;
 }
 
@@ -36,8 +38,9 @@ void execute_command(int cmd_num) {
             uart_send_string("timestamp: get current timestamp\r\n");
             uart_send_string("board_revision: get board revision\r\n");
             uart_send_string("vc_base: get VC core base address\r\n");
-            uart_send_string("svc_test: test svc instruction");
-            uart_send_string("brk_test: test brk instruction");
+            uart_send_string("svc_test: test svc instruction\r\n");
+            uart_send_string("brk_test: test brk instruction\r\n");
+            uart_send_string("daif: get current DAIF value\r\n");
 
         break;
 
@@ -53,10 +56,10 @@ void execute_command(int cmd_num) {
 
         case 3:
             char ts_msg[] = "Timestamp is: ";
-            char ts[128];
-            float ts_float = get_timestamp();
-            ftos(ts_float, ts);
-            string_concat(ts_msg, ts);
+            char ts[12];
+            //float ts_float = get_timestamp();
+            //ftos(ts_float, ts);
+            //string_concat(ts_msg, ts);
             string_concat(ts_msg, "\r\n");
             uart_send_string(ts_msg);
 
@@ -73,7 +76,7 @@ void execute_command(int cmd_num) {
         break;
 
         case 5:
-            char vc_msg[] = "VC Core Base Address is: ";
+            char vc_msg[] = "VC Core: ";
             char vc_base[] = "0x00000000";
             get_vc_base(vc_base);
             string_concat(vc_msg, vc_base);
@@ -83,19 +86,43 @@ void execute_command(int cmd_num) {
         break;
 
         case 6:
-            // svc #0;
             asm volatile ("mov x8, #0");
             asm volatile ("svc #0");
-            
         break;
 
         case 7:
             asm volatile ("mov x8, #0");
             asm volatile ("brk #0");
-            // brk #0;
-
         break;
 
+        case 8:
+            asm volatile ("mov x8, #1");
+            asm volatile ("brk #0");
+        break;
+
+        case 9:
+            unsigned long daif = 0;
+            asm volatile ("mrs %0, DAIF":"=r"(daif));
+            daif = (daif >> 5) & 0xF;
+            char daif_string[] = "0x00000000"; 
+            htos(daif, daif_string);
+            char daif_msg[30] = "DAIF is ";
+            string_concat(daif_msg, daif_string);
+            uart_send_string(daif_msg);
+            uart_send_string("\r\n");
+        break;
+
+        case 10:
+            unsigned long elr, esr, ec, iss;
+            unsigned int el;
+            asm volatile("mrs %0, CurrentEL" : "=r" (el));
+            el = (el >> 2) & 3;
+            char el_string[] = "0x00000000";
+            htos(el, el_string);
+            uart_send_string("Current EL is ");
+            uart_send_string(el_string);
+            uart_send_string("\r\n");
+        break;
         case -1:
             uart_send_string("Warning: Command Not Found");
         break;

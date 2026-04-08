@@ -21,7 +21,8 @@
 .endm
 
 // load general registers from stack
-.macro load_all
+.global load_all
+load_all:
   ldp x0, x1, [sp ,16 * 0]
   ldp x2, x3, [sp ,16 * 1]
   ldp x4, x5, [sp ,16 * 2]
@@ -40,51 +41,92 @@
   ldr x30, [sp, 16 * 15]
   add sp, sp, 32 * 8
   eret
-.endm
+
 
 
 // Simple vector table
 .align 11 // vector table should be aligned to 0x800
 .global exception_table
 exception_table:
-  b exception_handler // 0x000
-  .align 7 // entry size is 0x80, .align will pad 0
-  b exception_handler // 0x80
-  .align 7
-  b exception_handler // 0x100
-  .align 7
-  b exception_handler // 0x180
+  save_all
+  bl exception_handler // 0x000
+  b load_all
 
-  // 0x200
+  .align 7 // entry size is 0x80
+  save_all
+  bl exception_handler // 0x80
+  b load_all
+
   .align 7
   save_all
-  b system_call_handler 
-  load_all
+  bl exception_handler // 0x100
+  b load_all
 
   .align 7
-  b exception_handler // 0x280
-  .align 7
-  b exception_handler // 0x300
-    .align 7
-  b exception_handler
-  .align 7
+  save_all
+  bl exception_handler // 0x180
+  b load_all
 
-  b exception_handler
   .align 7
-  b exception_handler
+  save_all
+  bl system_call_handler // 0x200
+  b load_all
+  
   .align 7
-  b exception_handler
-  .align 7
-  b exception_handler
-  .align 7
+  save_all
+  bl exception_handler // 0x280
+  b load_all
 
-  b exception_handler
   .align 7
-  b exception_handler
+  save_all
+  bl exception_handler // 0x300
+  b load_all
+
   .align 7
-  b exception_handler
+  save_all
+  bl exception_handler //0x380
+  b load_all
+
   .align 7
-  b exception_handler
+  save_all
+  bl system_call_handler //0x400
+  b load_all
+  
+  .align 7
+  save_all
+  bl exception_handler
+  b load_all
+
+  .align 7
+  save_all
+  bl exception_handler
+  b load_all
+
+  .align 7
+  save_all
+  bl exception_handler
+  b load_all
+
+  .align 7
+  save_all
+  bl exception_handler
+  b load_all
+
+  .align 7
+  save_all
+  bl exception_handler
+  b load_all
+
+  .align 7
+  save_all
+  bl exception_handler
+  b load_all
+
+  .align 7
+  save_all
+  bl exception_handler
+  b load_all
+
   .align 7
 
 
