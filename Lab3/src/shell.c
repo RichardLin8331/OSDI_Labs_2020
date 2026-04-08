@@ -22,15 +22,16 @@ int parse_command(char* cmd) {
     else if (strcmp(cmd, "vc_base") == 0) return 5;
     else if (strcmp(cmd, "svc_test") == 0) return 6;
     else if (strcmp(cmd, "brk_test") == 0) return 7;
-    else if (strcmp(cmd, "irq") == 0) return 8;
-    else if (strcmp(cmd, "daif") == 0) return 9;
+    else if (strcmp(cmd, "timer") == 0) return 8;
+    else if (strcmp(cmd, "timer_stop") == 0) return 9;
+    else if (strcmp(cmd, "daif") == 0) return 10;
     return -1;
 }
 
 void execute_command(int cmd_num) {
     switch (cmd_num) {
         case 0:
-            uart_send_string("NYCU OSDI Lab1 Shell\r\n\n");
+            uart_send_string("NYCU OSDI Lab3 Shell\r\n\n");
             uart_send_string("Supported Commands: \r\n");
             uart_send_string("help: print shell information\r\n");
             uart_send_string("hello: print hello message\r\n");
@@ -40,6 +41,8 @@ void execute_command(int cmd_num) {
             uart_send_string("vc_base: get VC core base address\r\n");
             uart_send_string("svc_test: test svc instruction\r\n");
             uart_send_string("brk_test: test brk instruction\r\n");
+            uart_send_string("timer: start core timer\r\n");
+            uart_send_string("timer_stop: stop core timer\r\n");
             uart_send_string("daif: get current DAIF value\r\n");
 
         break;
@@ -97,10 +100,15 @@ void execute_command(int cmd_num) {
 
         case 8:
             asm volatile ("mov x8, #1");
-            asm volatile ("brk #0");
+            asm volatile ("svc #0");
         break;
 
         case 9:
+            asm volatile ("mov x8, #2");
+            asm volatile ("svc #0");
+        break;
+
+        case 10:
             unsigned long daif = 0;
             asm volatile ("mrs %0, DAIF":"=r"(daif));
             daif = (daif >> 5) & 0xF;
@@ -112,8 +120,7 @@ void execute_command(int cmd_num) {
             uart_send_string("\r\n");
         break;
 
-        case 10:
-            unsigned long elr, esr, ec, iss;
+        case 11:
             unsigned int el;
             asm volatile("mrs %0, CurrentEL" : "=r" (el));
             el = (el >> 2) & 3;
