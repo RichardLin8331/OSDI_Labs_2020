@@ -3,3 +3,4 @@ Lab2/kernel_sender
 */sender
 */kernel8.img
 .vscode
+*qemu.log*

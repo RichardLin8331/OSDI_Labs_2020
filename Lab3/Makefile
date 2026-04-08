@@ -47,6 +47,7 @@ clean:
 run:
 	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio 
 run-debug:
+	llvm-objdump -d --arch=arm64 build/kernel8.elf >> build/instr
 	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio -d int,unimp -D qemu.log
 run-pty:
 	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial pty
