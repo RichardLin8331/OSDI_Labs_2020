@@ -37,6 +37,9 @@ void uart_init() {
     *UART0_FBRD = 0xB;
     *UART0_LCRH = 0x7<<4;  // 8n1, enable FIFOs
     *UART0_CR = 0x301;     // enable Tx, Rx, UART
+    //*UART0_IMSC = 0x30;
+    sq_head = 0; sq_tail = 0; rq_head = 0; rq_tail = 0;
+
 }
 
 void uart_send(unsigned int c) {
@@ -52,4 +55,15 @@ char uart_get() {
 
 void uart_send_string(char* s) {
     while (*s != '\0') uart_send(*s++);
+}
+
+void uart_IRQ_handler() {
+    unsigned int uart_irq_imsc = *UART0_IMSC;
+    if (uart_irq_imsc & 0x10) { 
+        //RX irq
+
+    } else if (uart_irq_imsc & 0x20) {
+        // TX irq
+    }
+    *UART0_ICR &= uart_irq_imsc;
 }
