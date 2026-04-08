@@ -42,7 +42,14 @@ void system_call_handler() {
 
         case 1:
             core_timer_enable();
+            uart_send_string("Timer start\r\n");
         break;
+
+        case 2:
+            core_timer_disable();
+            uart_send_string("Timer stop\r\n");
+        break;
+
         case -1:
         
         }

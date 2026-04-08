@@ -94,7 +94,7 @@ exception_table:
   
   .align 7
   save_all
-  bl exception_handler
+  bl irq_handler
   b load_all
 
   .align 7

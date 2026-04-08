@@ -9,11 +9,11 @@
 [X] svc_test()
 [X] brk_test()
 [X] daif()
-[ ] irq_cmd()
+[X] irq_cmd()
 
 
 ### irq.c
-[ ] core_timer
+[X] core_timer
     + Routing: EL0 -> shell.c irq_cmd -> svc #0 -> EL1 -> sys_table[] -> enable_timer() -> EL0 ... wait for timer triggered ... -> EL1 -> irq.c -> core_timer() -> write to uart software buffer -> EL0
     + print("timer triggered")
 [ ] uart
@@ -22,8 +22,8 @@
     + Receive Routining: EL0 -> FIFO queue more than watermark -> trigger IRQ -> EL1 -> handler -> move data from FIFO to software buffer -> EL0
 
 ### systemcall_handler.c
-[ ] daif()
-[ ] timer()
+[X] daif()
+[X] timer()
 [X] sys_call_handler()
 
 
