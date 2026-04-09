@@ -1,5 +1,10 @@
 #include "include/uart.h"
 #include "include/mailbox.h"
+#include "include/queue.h"
+
+char sender_queue[QUEUE_SIZE];
+char receiver_queue[QUEUE_SIZE];
+int sq_head, sq_tail, rq_head, rq_tail;
 
 void uart_init() {
 
@@ -36,20 +41,35 @@ void uart_init() {
     *UART0_IBRD = 2;       // 115200 baud
     *UART0_FBRD = 0xB;
     *UART0_LCRH = 0x7<<4;  // 8n1, enable FIFOs
+    *UART0_IMSC = 0x30;
     *UART0_CR = 0x301;     // enable Tx, Rx, UART
-    //*UART0_IMSC = 0x30;
+    *UART0_IRQ_ENABLE = 0x2000000;
+    
     sq_head = 0; sq_tail = 0; rq_head = 0; rq_tail = 0;
-
 }
 
 void uart_send(unsigned int c) {
-    while (((*UART0_FR)&0x20)) asm volatile("nop");
-    *UART0_DR = c;
+
+    if (((*UART0_FR)&0x80)) {
+        if (queue_empty(sq_head, sq_tail) == 0) {
+            char tmp = queue_pop(sender_queue, &sq_head);
+            *UART0_DR = tmp;
+            queue_push(sender_queue, &sq_tail, c);
+        } else {
+            *UART0_DR = c;
+        } 
+    } else {
+        if (!queue_full(sq_head, sq_tail)) {
+            queue_push(sender_queue, &sq_tail, c);
+        }
+    }
+
 }
 
 char uart_get() {
-    while (((*UART0_FR)&0x10)) asm volatile("nop");
-    char c = (char) ((*UART0_DR)&0xFF);
+    while (queue_empty(rq_head, rq_tail) == 1);
+
+    char c = queue_pop(receiver_queue, &rq_head);
     return c == '\r' ? '\n' : c;
 }
 
@@ -58,12 +78,19 @@ void uart_send_string(char* s) {
 }
 
 void uart_IRQ_handler() {
-    unsigned int uart_irq_imsc = *UART0_IMSC;
-    if (uart_irq_imsc & 0x10) { 
-        //RX irq
+    unsigned int uart_irq_mis = *UART0_MIS;
+    if (uart_irq_mis & 0x10) { 
 
-    } else if (uart_irq_imsc & 0x20) {
-        // TX irq
+        while (!((*UART0_FR) & 0x10) && !queue_full(rq_head, rq_tail)) {
+            queue_push(receiver_queue, &rq_tail, (*UART0_DR));
+        }
+
+    } else if (uart_irq_mis & 0x20) {
+        while (queue_empty(sq_head, sq_tail) == 0) {
+            while ((*UART0_FR) & 0x20);
+            *UART0_DR = queue_pop(sender_queue, &sq_head);
+        }
     }
-    *UART0_ICR &= uart_irq_imsc;
+    *UART0_ICR |= uart_irq_mis;
+    return;
 }

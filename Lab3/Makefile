@@ -6,7 +6,7 @@ LD = $(ARMGNU)ld
 OBJCOPY = $(ARMGNU)objcopy
 
 
-CFLAGS = -Wall -O2 -ffreestanding -nostdlib -nostartfiles -Isrc/include
+CFLAGS = -Wall -O2 -ffreestanding -nostdlib -nostartfiles -Isrc/include -ggdb -Og
 ASMFLAGS = -Isrc/include
 
 
@@ -48,6 +48,10 @@ run:
 	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio 
 run-debug:
 	llvm-objdump -d --arch=arm64 build/kernel8.elf >> build/instr
-	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio -d int,unimp -D qemu.log
+	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio   -d int,unimp -D build/qemu.log
+
+run-debug-gdb:
+	llvm-objdump -d --arch=arm64 build/kernel8.elf >> build/instr
+	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio  -s -S -d int,unimp -D build/qemu.log
 run-pty:
 	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial pty
