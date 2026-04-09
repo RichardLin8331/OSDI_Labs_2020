@@ -10,12 +10,12 @@ int queue_full(int q_head, int q_tail) {
 }
 
 void queue_push(char* q, int* q_tail, char c) {
-    q[*q_tail] = c;
-    *(++q_tail) %= QUEUE_SIZE;
+    q[(*q_tail)++] = c;
+    *(q_tail) %= QUEUE_SIZE;
 }
 
 char queue_pop(char* q, int* q_head) {
-    char tmp = q[*q_head];
-    *(++q_head) %= QUEUE_SIZE;
+    char tmp = q[(*q_head)++];
+    *(q_head) %= QUEUE_SIZE;
     return tmp;
 }
