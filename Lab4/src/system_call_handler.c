@@ -1,0 +1,111 @@
+#include "include/string.h"
+#include "include/uart.h"
+#include "include/core_timer.h"
+
+void svc_print_message() {
+    unsigned long elr, esr, ec, iss;
+    asm volatile ("mrs %0, elr_el1":"=r"(elr));
+    asm volatile ("mrs %0, esr_el1":"=r"(esr));
+    ec = (esr & 0xFFFFFFFF) >> 26;
+    iss = esr & 0xFFFFFF;
+    char elr_string[] = "0x00000000";
+    char ec_string[] = "0x00000000";
+    char iss_string[] = "0x00000000";
+    htos(elr, elr_string);
+    htos(ec, ec_string);
+    htos(iss, iss_string);
+    char elr_msg[] = "ELR_EL1 is ";
+    string_concat(elr_msg, elr_string);
+    uart_send_string(elr_msg);
+    uart_send_string("\r\n");
+    
+    char ec_msg[] = "EC is ";
+    string_concat(ec_msg, ec_string);
+    uart_send_string(ec_msg);
+    uart_send_string("\r\n");
+
+    char iss_msg[] = "ISS is ";
+    string_concat(iss_msg, iss_string);
+    uart_send_string(iss_msg);
+    uart_send_string("\r\n");
+
+}
+
+void svc_print_daif() {
+    unsigned long daif = 0;
+    asm volatile ("mrs %0, DAIF":"=r"(daif));
+    daif = (daif >> 5) & 0xF;
+    char daif_string[] = "0x00000000"; 
+    htos(daif, daif_string);
+    char daif_msg[30] = "DAIF is ";
+    string_concat(daif_msg, daif_string);
+    uart_send_string(daif_msg);
+    uart_send_string("\r\n");
+}
+
+int svc_uart_write(unsigned long buff_addr, unsigned long buff_size) {
+    int uw_cnt = 0;
+    char* buff_string = (char*) buff_addr;
+    for (uw_cnt = 0; uw_cnt < buff_size; uw_cnt++) uart_send(*buff_string++);
+    return uw_cnt;
+}
+
+long system_call_handler() {
+    int sc_num;
+    asm volatile ("mov %0, x8": "=r"(sc_num));
+
+    switch (sc_num) {
+        case 0:
+            svc_print_message();
+            break;
+
+        case 1:
+            core_timer_enable();
+            uart_send_string("Timer start\r\n");
+        break;
+
+        case 2:
+            core_timer_disable();
+            uart_send_string("Timer stop\r\n");
+        break;
+
+        case 3:
+            svc_print_daif();
+        break;
+
+        case 4:
+            return 9;
+        break;
+
+        case 5:
+            unsigned long buff_addr, buff_size;
+            asm volatile ("mov %0, x3":"=r"(buff_addr));
+            asm volatile ("mov %0, x1":"=r"(buff_size));
+            return svc_uart_write(buff_addr, buff_size);
+        break;
+
+        case 6:
+            asm volatile("msr DAIFClr, 0x2");
+            unsigned long buff_addr2, buff_size2;
+            int uw_cnt2 = 0;
+            asm volatile ("mov %0, x3":"=r"(buff_addr2));
+            asm volatile ("mov %0, x1":"=r"(buff_size2));
+            char* buff_string2 = (char*) buff_addr2;
+            
+            for (uw_cnt2 = 0; uw_cnt2 < buff_size2; uw_cnt2++) {
+                while (queue_empty(rq_head, rq_tail) == 1);
+                char tmp = queue_pop(receiver_queue, &rq_head);
+                uart_send(tmp);
+                buff_string2[uw_cnt2] = tmp; 
+            }
+            buff_string2[uw_cnt2] = '\0';
+            asm volatile("msr DAIFSet, 0xf");
+            return uw_cnt2;
+        break;
+
+
+        case -1:
+        
+        }
+    return 0;
+}
