@@ -12,10 +12,8 @@ _start:
       b 1b
 
 el2_init:
-// load exception_table to vbar_el2
     ldr x0, =exception_table
     msr vbar_el2, x0
-
     mrs x0, hcr_el2
     orr x0, x0, #(1 << 31) // EL1 use aarch64
     bic x0, x0, #(1 << 4)
@@ -24,13 +22,14 @@ el2_init:
     msr spsr_el2, x0
     adr x0, el1_init // load exception return address
     msr elr_el2, x0
-    mov x0, 0x200000 // init sp for el1 option 1
+    mov x0, 0x200000 // init kernel sp for el1 option 1
     msr sp_el1, x0
 
     eret
 
 el1_init:
-    mov x0, #(3 << 20)      // Full access to CP10 and CP11
+    mrs x0, cpacr_el1
+    orr x0, x0, #(3 << 20)      // Full access to CP10 and CP11
     msr cpacr_el1, x0
     isb
 
@@ -45,15 +44,8 @@ el1_init:
     str     xzr, [x0], #8  
     b       3b
 4:
-    mov x0, 0xA00000
-    msr sp_el0, x0
     mov x0, #0 // EL0 with interrupt enabled
     msr spsr_el1, x0
-    adr x0, el0_init // return to shell run in EL0
-    msr elr_el1, x0
 
-    eret
-
-el0_init:
     bl main
     b 1b

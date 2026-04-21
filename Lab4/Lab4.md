@@ -18,7 +18,7 @@
         elr_el1
     } -> save when enters EL1
 }
-- [ ] priviledge_task_create()
+- [ ] privilege_task_create()
 - [ ] user_task_create()
 - [ ] do_exec()
 ### scheduler.c
@@ -28,3 +28,7 @@
 ### system_call_handler.c
 - [ ] uart_read() and uart_write()
 - [ ] exec()
+### mm.c
+- [ ] get_free_kernel_stack()
+- [ ] get_free_user_stack()
+- [ ] memzero()

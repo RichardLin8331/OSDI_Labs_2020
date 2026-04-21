@@ -126,6 +126,7 @@ exception_table:
   .align 7
   save_all
   bl system_call_handler // 0x200
+  str	x0, [sp, #0] 
   b load_all
   
   .align 7
@@ -186,5 +187,10 @@ exception_table:
 
   .align 7
 
-
-
+.global return_from_fork
+return_from_fork:
+  cbz x19, return_to_el0
+  blr x19
+return_to_el0:
+  mov x0, #0
+  b load_all

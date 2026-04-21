@@ -24,3 +24,11 @@ void irq_handler() {
     }
     return;
 }
+
+void irq_enable() {
+    asm volatile("msr DAIFClr, 0x2");
+}
+
+void irq_disable() {
+    asm volatile("msr DAIFSet, 0xf");
+}

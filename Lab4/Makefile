@@ -23,6 +23,7 @@ OBJ_FILES += $(patsubst $(SRCDIR)/%.S, $(BUILDDIR)/%_s.o, $(ASM_SOURCES))
 
 
 all: clean kernel8.img run
+all-debug-gdb: clean kernel8.img run-debug-gdb
 
 
 kernel8.img: $(BUILDDIR)/kernel8.elf
