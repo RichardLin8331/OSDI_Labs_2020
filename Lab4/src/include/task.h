@@ -42,6 +42,6 @@ extern struct task_struct* task_pool[TASK_POOL_SIZE];
 void init_kernel_task();
 int privilege_task_create(void(*fn));
 int user_task_create();
-
+void do_exec(void* fn);
 
 #endif

@@ -2,6 +2,7 @@
 #include "include/mm.h"
 #include "include/exception.h"
 #include "include/task_queue.h"
+#include "include/scheduler.h"
 
 struct task_struct* task_pool[TASK_POOL_SIZE];
 
@@ -43,9 +44,11 @@ int privilege_task_create(void* fn) {
     memzero(ks - PAGE_SIZE, ks);
     tmp->context.sp_kernel = ks - sizeof(struct trapframe);
     tmp->context.lr = (unsigned long) return_from_fork;
+    tmp->context.x19 = (unsigned long) fn;
+
     tmp->trapframe = (struct trapframe*) (tmp->context.sp_kernel);
     
-    tmp->context.x19 = (unsigned long) fn;
+    
     tmp->reschedule_flag = 0;
     task_pool[pid] = tmp;
 
@@ -56,7 +59,7 @@ int privilege_task_create(void* fn) {
 }
 
 // called by fork() system call
-/*
+
 int user_task_create() {
     struct task_struct* tmp;
     int pid = get_task_id();
@@ -66,19 +69,41 @@ int user_task_create() {
     tmp = (struct task_struct*) TASK_BASE + pid * PAGE_SIZE;
     memzero(tmp, tmp + sizeof(struct task_struct));
     tmp->pid = pid;
-    //memcpy(tmp->context)
-    memcpy(tmp->trapframe);
+    tmp->context = current->context;
+    
+    
 
     memzero(ks - PAGE_SIZE, ks);
     memzero(us - PAGE_SIZE, us);
     tmp->context.sp_kernel = ks - sizeof(struct trapframe);
     tmp->context.lr = (unsigned long) return_from_fork;
     tmp->trapframe = (struct trapframe*) (tmp->context.sp_kernel);
-    //tmp->trapframe->sp_user = us;
+    *(tmp->trapframe) = *(current->trapframe);
+    tmp->trapframe->sp_user = us;
+
+    // copy user stack 
     
     tmp->context.x19 = 0;
     task_pool[pid] = tmp;
     return pid;
 }
 
-*/
+void do_exec(void* fn) {
+    memzero(current->trapframe, current->trapframe + sizeof(struct trapframe));
+    current->trapframe->elr_el1 = (unsigned long) fn;
+    current->trapframe->esr_el1 = 0x0;
+    unsigned long sp_k = (unsigned long)current->trapframe;
+    char spks[] = "0x00000000";
+    htos(sp_k, spks);
+    unsigned long us = get_free_user_stack();
+    if (us == -1) return;
+    memzero(us - PAGE_SIZE, us);
+    current->trapframe->sp_user = us;
+
+    //schedule();
+    asm volatile ("mov sp, %0"::"r"(current->trapframe));
+    asm volatile ("b load_all");
+    // b load_all
+    return;
+}
+

@@ -35,13 +35,39 @@ void foo(){
         itos(current->pid, pid_str);
         uart_send_string(pid_str);
         uart_send_string("\r\n");
+        
+        int cnt = 10000000000;
+        while(cnt--);
+    }
+}
+void user_task() {
+    while(1) {
+        uart_send_string("Goto EL0 user_task()\r\n");
+        
+        int cnt = 10000000000;
+        while(cnt--);
+    }
+    
+}
+void foo2(){
+    while(1) {
+        irq_enable();
+        get_daif();
+        uart_send_string("Task pid: ");
+        char pid_str[6];
+        itos(current->pid, pid_str);
+        uart_send_string(pid_str);
+        uart_send_string("\r\n");
         get_daif();
         //irq_disable();
+        do_exec(user_task);
+
         int cnt = 10000000000;
         while(cnt--);
         //schedule();
     }
 }
+
 
 
 void main () {
@@ -57,6 +83,7 @@ void main () {
         privilege_task_create(foo);
         uart_send_string("Privilege task created\r\n");
     }
+    privilege_task_create(foo2);
     core_timer_enable();
     irq_enable();
     idle();
