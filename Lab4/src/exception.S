@@ -20,15 +20,15 @@
   mrs	x22, sp_el0
 	mrs	x23, elr_el1
 	mrs	x24, spsr_el1
-  stp x22, x23, [sp ,16 * 15]
-  stp x24, x30, [sp, 16 * 16]
+  stp x30, x22, [sp ,16 * 15]
+  stp x23, x24, [sp, 16 * 16]
 .endm
 
 // load general registers from stack
 .global load_all
 load_all:
-  ldp x24, x30, [sp, 16 * 16]
-  ldp x22, x23, [sp ,16 * 15]
+  ldp x23, x24, [sp, 16 * 16]
+  ldp x30, x22, [sp ,16 * 15]
   msr	sp_el0, x22
 	msr	elr_el1, x23
 	msr	spsr_el1, x24
@@ -70,15 +70,15 @@ load_all:
   stp x28, x29, [sp ,16 * 14]
 	mrs	x23, elr_el1
 	mrs	x24, spsr_el1
-  stp x22, x23, [sp ,16 * 15]
-  stp x24, x30, [sp, 16 * 16]
+  stp x30, x22, [sp ,16 * 15]
+  stp x23, x24, [sp, 16 * 16]
 .endm
 
 // load general registers from stack
 .global load_all_el1_irq
 load_all_el1_irq:
-  ldp x24, x30, [sp, 16 * 16]
-  ldp x22, x23, [sp ,16 * 15]
+  ldp x23, x24, [sp, 16 * 16]
+  ldp x30, x22, [sp ,16 * 15]
 	msr	elr_el1, x23
 	msr	spsr_el1, x24
   ldp x0, x1, [sp ,16 * 0]
