@@ -93,7 +93,9 @@ long system_call_handler() {
             char* buff_string2 = (char*) buff_addr2;
             
             for (uw_cnt2 = 0; uw_cnt2 < buff_size2; uw_cnt2++) {
-                while (queue_empty(rq_head, rq_tail) == 1);
+                while (queue_empty(rq_head, rq_tail) == 1); 
+                // wait_queue_push(current)
+                // schedule()
                 char tmp = queue_pop(receiver_queue, &rq_head);
                 uart_send(tmp);
                 buff_string2[uw_cnt2] = tmp; 

@@ -46,6 +46,7 @@ int privilege_task_create(void* fn) {
     tmp->trapframe = (struct trapframe*) (tmp->context.sp_kernel);
     
     tmp->context.x19 = (unsigned long) fn;
+    tmp->reschedule_flag = 0;
     task_pool[pid] = tmp;
 
     running_queue_push(running_queue, &running_queue_tail, tmp);

@@ -27,19 +27,20 @@ void idle () {
 }
 
 void foo(){
-  while(1) {
-    irq_enable();
-    get_daif();
-    uart_send_string("Task pid: ");
-    char pid_str[6];
-    itos(current->pid, pid_str);
-    uart_send_string(pid_str);
-    uart_send_string("\r\n");
-    irq_disable();
-    int cnt = 100000000;
-    while(cnt--);
-    schedule();
-  }
+    while(1) {
+        irq_enable();
+        get_daif();
+        uart_send_string("Task pid: ");
+        char pid_str[6];
+        itos(current->pid, pid_str);
+        uart_send_string(pid_str);
+        uart_send_string("\r\n");
+        get_daif();
+        //irq_disable();
+        int cnt = 10000000000;
+        while(cnt--);
+        //schedule();
+    }
 }
 
 
@@ -56,5 +57,9 @@ void main () {
         privilege_task_create(foo);
         uart_send_string("Privilege task created\r\n");
     }
+    core_timer_enable();
+    irq_enable();
     idle();
+    //irq_disable();
+    
 }

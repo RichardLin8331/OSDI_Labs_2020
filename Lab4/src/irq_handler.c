@@ -2,6 +2,8 @@
 #include "include/core_timer.h"
 #include "include/string.h"
 #include "include/irq_handler.h"
+#include "include/task.h"
+#include "include/scheduler.h"
 
 int core_timer_cnt = 0;
 void irq_handler() {
@@ -19,8 +21,14 @@ void irq_handler() {
         uart_send_string(timer_cnt_string);
         uart_send_string("\r\n# ");
         core_timer_handler();
+        current->reschedule_flag = 1;
     } else if (uart0_pending & 0x2000000) {
         uart_IRQ_handler();
+    }
+    if (current->reschedule_flag == 1) {
+        
+        current->reschedule_flag = 0;
+        schedule();
     }
     return;
 }

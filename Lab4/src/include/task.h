@@ -32,6 +32,7 @@ struct task_struct{
     struct cpu_context context;
     struct trapframe* trapframe;
     unsigned long pid;
+    unsigned short reschedule_flag;
     
     
 };
