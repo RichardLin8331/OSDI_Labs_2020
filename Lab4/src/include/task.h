@@ -3,6 +3,10 @@
 
 #define TASK_POOL_SIZE 64
 
+#define TASK_RUNNING 1
+#define TASK_WAITING 2
+#define TASK_EXIT 3;
+
 struct cpu_context{
     unsigned long x19;
     unsigned long x20;
@@ -33,6 +37,7 @@ struct task_struct{
     struct trapframe* trapframe;
     unsigned long pid;
     unsigned short reschedule_flag;
+    unsigned short task_status;
 };
 
 extern struct task_struct* task_pool[TASK_POOL_SIZE];

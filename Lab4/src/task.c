@@ -50,9 +50,10 @@ int privilege_task_create(void* fn) {
     
     
     tmp->reschedule_flag = 0;
+    tmp->task_status = TASK_RUNNING;
     task_pool[pid] = tmp;
 
-    running_queue_push(running_queue, &running_queue_tail, tmp);
+    task_queue_push(running_queue, &running_queue_tail, tmp);
     
 
     return pid;
@@ -83,6 +84,10 @@ int user_task_create() {
     // copy user stack 
     
     tmp->context.x19 = 0;
+    
+    tmp->reschedule_flag = 0;
+    tmp->task_status = TASK_RUNNING;
+
     task_pool[pid] = tmp;
     return pid;
 }

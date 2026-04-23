@@ -1,6 +1,9 @@
 #include "include/uart.h"
 #include "include/mailbox.h"
 #include "include/queue.h"
+#include "include/task_queue.h"
+#include "include/task.h"
+#include "include/scheduler.h"
 
 char sender_queue[QUEUE_SIZE];
 char receiver_queue[QUEUE_SIZE];
@@ -83,6 +86,12 @@ void uart_IRQ_handler() {
 
         while (!((*UART0_FR) & 0x10) && !queue_full(rq_head, rq_tail)) {
             queue_push(receiver_queue, &rq_tail, (*UART0_DR));
+            if (queue_empty(waiting_queue_head, waiting_queue_tail) == 0) {
+                struct task_struct* tmp = task_queue_pop(waiting_queue, &waiting_queue_head);
+                tmp->task_status = TASK_RUNNING;
+                task_queue_push_head(running_queue, &running_queue_head, tmp);
+                current->reschedule_flag = 1;
+            }
         }
 
     } else if (uart_irq_mis & 0x20) {

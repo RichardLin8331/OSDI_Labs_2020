@@ -3,11 +3,15 @@
 
 #include "task.h"
 
-#define RUNNING_QUEUE_SIZE 100
-extern struct task_struct* running_queue[RUNNING_QUEUE_SIZE];
+#define TASK_QUEUE_SIZE 100
+extern struct task_struct* running_queue[TASK_QUEUE_SIZE];
 extern int running_queue_head, running_queue_tail;
 
-void running_queue_push(struct task_struct** r_queue, int* r_q_tail, struct task_struct *t);
-struct task_struct* running_queue_pop(struct task_struct** r_queue, int* r_q_head);
+extern struct task_struct* waiting_queue[TASK_QUEUE_SIZE];
+extern int waiting_queue_head, waiting_queue_tail;
+
+void task_queue_push(struct task_struct** t_queue, int* t_q_tail, struct task_struct *t);
+void task_queue_push_head(struct task_struct** t_queue, int* t_q_head, struct task_struct *t); 
+struct task_struct* task_queue_pop(struct task_struct** t_queue, int* t_q_head);
 
 #endif

@@ -29,7 +29,6 @@ void irq_handler() {
         itos(core_timer_cnt, timer_cnt_string);
         uart_send_string(timer_cnt_string);
         uart_send_string("\r\n# ");
-        ///core_timer_handler();
         current->reschedule_flag = 1;
     } else if (uart0_pending & 0x2000000) {
         uart_IRQ_handler();

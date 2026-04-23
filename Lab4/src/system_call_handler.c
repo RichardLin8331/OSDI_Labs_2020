@@ -57,9 +57,9 @@ int svc_uart_recv(unsigned long buff_addr, unsigned long buff_size) {
     char* buff_string = (char*) buff_addr;
     int uw_cnt = 0;        
     for (uw_cnt = 0; uw_cnt < buff_size; uw_cnt++) {
+        current->task_status = TASK_WAITING;
+        schedule();
         while (queue_empty(rq_head, rq_tail) == 1); 
-        // wait_queue_push(current)
-        // schedule()
         char tmp = queue_pop(receiver_queue, &rq_head);
         uart_send(tmp);
         buff_string[uw_cnt] = tmp; 

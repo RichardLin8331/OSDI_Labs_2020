@@ -29,6 +29,7 @@ void idle () {
 
 void foo(){
     while(1) {
+        irq_enable();
         uart_send_string("Task pid: ");
         char pid_str[6];
         itos(current->pid, pid_str);
@@ -36,7 +37,7 @@ void foo(){
         uart_send_string("\r\n# ");
         get_daif();
 
-        schedule();
+        //schedule();
         int cnt = 10000000000;
         while(cnt--);
     }
@@ -52,13 +53,16 @@ void user_task() {
         char buff_2[] = "\r\n# ";
         string_concat(buff_s, buff_2);
         char buff_3[] = "Type something: ";
-        string_concat(buff_s, buff_3);
-        int buff_size = get_length(buff_s);
-        uart_write(buff_s, buff_size);
+        //string_concat(buff_s, buff_3);
+        int buff_size = get_length(buff_3);
+        uart_write(buff_3, buff_size);
 
         char buff_r[10];
         int buff_size_r = 6;
         uart_recv(buff_r, buff_size_r);
+        
+        buff_size = get_length(buff_s);
+        uart_write(buff_s, buff_size);
         int cnt = 10000000000;
         while(cnt--);
     }
