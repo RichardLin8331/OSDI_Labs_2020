@@ -71,7 +71,6 @@ int user_task_create() {
     tmp->pid = pid;
     tmp->context = current->context;
     
-    
 
     memzero(ks - PAGE_SIZE, ks);
     memzero(us - PAGE_SIZE, us);
@@ -100,10 +99,9 @@ void do_exec(void* fn) {
     memzero(us - PAGE_SIZE, us);
     current->trapframe->sp_user = us;
 
-    //schedule();
     asm volatile ("mov sp, %0"::"r"(current->trapframe));
     asm volatile ("b load_all");
-    // b load_all
+
     return;
 }
 

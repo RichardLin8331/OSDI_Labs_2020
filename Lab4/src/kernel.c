@@ -4,6 +4,7 @@
 #include "include/task.h"
 #include "include/scheduler.h"
 #include "include/irq_handler.h"
+#include "include/user_lib.h"
 
 void get_daif() {
     unsigned long daif = 0;
@@ -14,7 +15,7 @@ void get_daif() {
     char daif_msg[30] = "DAIF is ";
     string_concat(daif_msg, daif_string);
     uart_send_string(daif_msg);
-    uart_send_string("\r\n");
+    uart_send_string("\r\n# ");
 }
 
 
@@ -28,27 +29,42 @@ void idle () {
 
 void foo(){
     while(1) {
-        irq_enable();
-        get_daif();
         uart_send_string("Task pid: ");
         char pid_str[6];
         itos(current->pid, pid_str);
         uart_send_string(pid_str);
-        uart_send_string("\r\n");
-        
+        uart_send_string("\r\n# ");
+        get_daif();
+
+        schedule();
         int cnt = 10000000000;
         while(cnt--);
     }
 }
 void user_task() {
     while(1) {
-        uart_send_string("Goto EL0 user_task()\r\n");
-        
+        //uart_send_string("Goto EL0 user_task()\r\n# ");
+        char buff_s[] = "Goto EL0 user_task()\r\n# Current PID is ";
+        int pid = get_current_task_id();
+        char pid_s[5];
+        itos(pid, pid_s);
+        string_concat(buff_s, pid_s);
+        char buff_2[] = "\r\n# ";
+        string_concat(buff_s, buff_2);
+        char buff_3[] = "Type something: ";
+        string_concat(buff_s, buff_3);
+        int buff_size = get_length(buff_s);
+        uart_write(buff_s, buff_size);
+
+        char buff_r[10];
+        int buff_size_r = 6;
+        uart_recv(buff_r, buff_size_r);
         int cnt = 10000000000;
         while(cnt--);
     }
     
 }
+
 void foo2(){
     while(1) {
         irq_enable();
@@ -57,7 +73,7 @@ void foo2(){
         char pid_str[6];
         itos(current->pid, pid_str);
         uart_send_string(pid_str);
-        uart_send_string("\r\n");
+        uart_send_string("\r\n# ");
         get_daif();
         //irq_disable();
         do_exec(user_task);

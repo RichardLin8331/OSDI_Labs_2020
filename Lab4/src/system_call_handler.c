@@ -1,6 +1,8 @@
 #include "include/string.h"
 #include "include/uart.h"
 #include "include/core_timer.h"
+#include "include/scheduler.h"
+#include "include/irq_handler.h"
 
 void svc_print_message() {
     unsigned long elr, esr, ec, iss;
@@ -50,6 +52,23 @@ int svc_uart_write(unsigned long buff_addr, unsigned long buff_size) {
     return uw_cnt;
 }
 
+int svc_uart_recv(unsigned long buff_addr, unsigned long buff_size) {
+    irq_enable();
+    char* buff_string = (char*) buff_addr;
+    int uw_cnt = 0;        
+    for (uw_cnt = 0; uw_cnt < buff_size; uw_cnt++) {
+        while (queue_empty(rq_head, rq_tail) == 1); 
+        // wait_queue_push(current)
+        // schedule()
+        char tmp = queue_pop(receiver_queue, &rq_head);
+        uart_send(tmp);
+        buff_string[uw_cnt] = tmp; 
+    }
+    buff_string[uw_cnt] = '\0';
+    irq_disable();
+    return uw_cnt;
+}
+
 long system_call_handler() {
     int sc_num;
     asm volatile ("mov %0, x8": "=r"(sc_num));
@@ -74,35 +93,22 @@ long system_call_handler() {
         break;
 
         case 4:
-            return 9;
+            return current->pid;
         break;
 
         case 5:
             unsigned long buff_addr, buff_size;
-            asm volatile ("mov %0, x3":"=r"(buff_addr));
-            asm volatile ("mov %0, x1":"=r"(buff_size));
+            buff_addr = current->trapframe->regs[0];
+            buff_size = current->trapframe->regs[1];
             return svc_uart_write(buff_addr, buff_size);
         break;
 
         case 6:
-            asm volatile("msr DAIFClr, 0x2");
             unsigned long buff_addr2, buff_size2;
-            int uw_cnt2 = 0;
-            asm volatile ("mov %0, x3":"=r"(buff_addr2));
-            asm volatile ("mov %0, x1":"=r"(buff_size2));
-            char* buff_string2 = (char*) buff_addr2;
-            
-            for (uw_cnt2 = 0; uw_cnt2 < buff_size2; uw_cnt2++) {
-                while (queue_empty(rq_head, rq_tail) == 1); 
-                // wait_queue_push(current)
-                // schedule()
-                char tmp = queue_pop(receiver_queue, &rq_head);
-                uart_send(tmp);
-                buff_string2[uw_cnt2] = tmp; 
-            }
-            buff_string2[uw_cnt2] = '\0';
-            asm volatile("msr DAIFSet, 0xf");
-            return uw_cnt2;
+            buff_addr2 = current->trapframe->regs[0];
+            buff_size2 = current->trapframe->regs[1];
+           
+            return svc_uart_recv(buff_addr2, buff_size2);
         break;
 
 

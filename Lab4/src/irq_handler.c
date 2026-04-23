@@ -6,6 +6,15 @@
 #include "include/scheduler.h"
 
 int core_timer_cnt = 0;
+
+void irq_enable() {
+    asm volatile("msr DAIFClr, 0x2");
+}
+
+void irq_disable() {
+    asm volatile("msr DAIFSet, 0xf");
+}
+
 void irq_handler() {
     unsigned int core0int = 0;
     core0int = *CORE0INTSRC;
@@ -20,23 +29,15 @@ void irq_handler() {
         itos(core_timer_cnt, timer_cnt_string);
         uart_send_string(timer_cnt_string);
         uart_send_string("\r\n# ");
-        core_timer_handler();
+        ///core_timer_handler();
         current->reschedule_flag = 1;
     } else if (uart0_pending & 0x2000000) {
         uart_IRQ_handler();
     }
     if (current->reschedule_flag == 1) {
-        
         current->reschedule_flag = 0;
         schedule();
     }
     return;
 }
 
-void irq_enable() {
-    asm volatile("msr DAIFClr, 0x2");
-}
-
-void irq_disable() {
-    asm volatile("msr DAIFSet, 0xf");
-}
