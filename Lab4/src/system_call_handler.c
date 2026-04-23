@@ -111,6 +111,16 @@ long system_call_handler() {
             return svc_uart_recv(buff_addr2, buff_size2);
         break;
 
+        case 7:
+            unsigned long fn = current->trapframe->regs[0];
+            do_exec(fn);
+            return 0;
+        break;
+
+        case 8:
+            return user_task_create();
+        break;
+
 
         case -1:
         

@@ -15,7 +15,7 @@ void get_daif() {
     char daif_msg[30] = "DAIF is ";
     string_concat(daif_msg, daif_string);
     uart_send_string(daif_msg);
-    uart_send_string("\r\n# ");
+    uart_send_string("\r\n\r\n# ");
 }
 
 
@@ -36,6 +36,7 @@ void foo(){
         uart_send_string(pid_str);
         uart_send_string("\r\n# ");
         get_daif();
+        //uart_send_string("\r\n\r\n# ");
 
         //schedule();
         int cnt = 10000000000;
@@ -60,7 +61,7 @@ void user_task() {
         char buff_r[10];
         int buff_size_r = 6;
         uart_recv(buff_r, buff_size_r);
-        
+
         buff_size = get_length(buff_s);
         uart_write(buff_s, buff_size);
         int cnt = 10000000000;
@@ -68,6 +69,84 @@ void user_task() {
     }
     
 }
+
+void user_task_22() {
+    while(1) {
+        //uart_send_string("Goto EL0 user_task()\r\n# ");
+        char buff_s[] = "Goto EL0 user_task_22()\r\n# Current PID is ";
+        int pid = get_current_task_id();
+        char pid_s[5];
+        itos(pid, pid_s);
+        string_concat(buff_s, pid_s);
+        char buff_2[] = "\r\n# ";
+        string_concat(buff_s, buff_2);
+        
+        int buff_size = get_length(buff_s);
+        uart_write(buff_s, buff_size);
+        int cnt = 10000000000;
+        while(cnt--);
+    }
+    
+}
+
+void user_task_21() {
+    while(1) {
+        //uart_send_string("Goto EL0 user_task()\r\n# ");
+        char buff_s[] = "Goto EL0 user_task_21()\r\n# Current PID is ";
+        int pid = get_current_task_id();
+        char pid_s[5];
+        itos(pid, pid_s);
+        string_concat(buff_s, pid_s);
+        char buff_2[] = "\r\n# ";
+        string_concat(buff_s, buff_2);
+        
+        int buff_size = get_length(buff_s);
+        uart_write(buff_s, buff_size);
+        exec(user_task_22);
+        int cnt = 10000000000;
+        while(cnt--);
+    }
+    
+}
+
+void user_task_3() {
+    int pid = fork();
+    while(1) {
+        //uart_send_string("Goto EL0 user_task()\r\n# ");
+        if (pid != 0) {
+            char buff_s[] = "Goto EL0 user_task_3()\r\n# This is parent process\r\n# Current PID is ";
+            int pid = get_current_task_id();
+            char pid_s[5];
+            itos(pid, pid_s);
+            string_concat(buff_s, pid_s);
+            char buff_2[] = "\r\n\r\n# ";
+            string_concat(buff_s, buff_2);
+            
+            int buff_size = get_length(buff_s);
+            uart_write(buff_s, buff_size);
+
+            int cnt = 10000000000;
+            while(cnt--);
+        } else {
+            char buff_s[] = "Goto EL0 user_task_3()\r\n# This is child process\r\n# Current PID is ";
+            int pid = get_current_task_id();
+            char pid_s[5];
+            itos(pid, pid_s);
+            string_concat(buff_s, pid_s);
+            char buff_2[] = "\r\n\r\n# ";
+            string_concat(buff_s, buff_2);
+            
+            int buff_size = get_length(buff_s);
+            uart_write(buff_s, buff_size);
+
+            int cnt = 10000000000;
+            while(cnt--);
+        }
+    }
+    
+}
+
+
 
 void foo2(){
     while(1) {
@@ -80,7 +159,7 @@ void foo2(){
         uart_send_string("\r\n# ");
         get_daif();
         //irq_disable();
-        do_exec(user_task);
+        do_exec(user_task_3);
 
         int cnt = 10000000000;
         while(cnt--);

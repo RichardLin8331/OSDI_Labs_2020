@@ -60,7 +60,6 @@ int privilege_task_create(void* fn) {
 }
 
 // called by fork() system call
-
 int user_task_create() {
     struct task_struct* tmp;
     int pid = get_task_id();
@@ -72,23 +71,28 @@ int user_task_create() {
     tmp->pid = pid;
     tmp->context = current->context;
     
-
     memzero(ks - PAGE_SIZE, ks);
     memzero(us - PAGE_SIZE, us);
+
     tmp->context.sp_kernel = ks - sizeof(struct trapframe);
     tmp->context.lr = (unsigned long) return_from_fork;
     tmp->trapframe = (struct trapframe*) (tmp->context.sp_kernel);
     *(tmp->trapframe) = *(current->trapframe);
-    tmp->trapframe->sp_user = us;
+    //tmp->trapframe->sp_user = us;
 
     // copy user stack 
-    
+    unsigned long cur_user_stack_offset = (current->trapframe->sp_user - USER_STACK_BASE) % PAGE_SIZE;
+    //unsigned long cur_user_stack_base = current->trapframe->sp_user - cur_user_stack_offset;
+    tmp->trapframe->sp_user = us + cur_user_stack_offset;
+    memcpy(tmp->trapframe->sp_user, current->trapframe->sp_user, cur_user_stack_offset);
+
+
     tmp->context.x19 = 0;
-    
     tmp->reschedule_flag = 0;
     tmp->task_status = TASK_RUNNING;
-
+    tmp->trapframe->regs[0] = 0;
     task_pool[pid] = tmp;
+    task_queue_push(running_queue, &running_queue_tail, tmp);
     return pid;
 }
 

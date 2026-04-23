@@ -12,6 +12,7 @@
 
 #ifndef __ASSEMBLER__
 void memzero(unsigned long mem_bottom, unsigned long mem_top);
+void memcpy(unsigned long dst_stack_bottom, unsigned long src_stack_bottom, unsigned long stack_size);
 unsigned long get_free_kernel_stack();
 unsigned long get_free_user_stack();
 int assign_task_mem(unsigned short i);

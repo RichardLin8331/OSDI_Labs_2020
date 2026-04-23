@@ -33,3 +33,22 @@ int uart_recv(char* buff, unsigned long buff_size) {
     uart_send_string("\r\n# ");
     return ret_ri;
 }
+
+int exec(void* fn) {
+    unsigned long fn_addr = (unsigned long) fn;
+    int ret_ri = 0;
+
+    asm volatile ("mov x0, %0"::"r"(fn_addr));
+    asm volatile ("mov x8, #7");
+    asm volatile ("svc #0");
+    asm volatile ("mov %0, x0":"=r"(ret_ri));
+    return ret_ri;
+}
+
+int fork() {
+    int ret_ri = 0;
+    asm volatile ("mov x8, #8");
+    asm volatile ("svc #0");
+    asm volatile ("mov %0, x0":"=r"(ret_ri));
+    return ret_ri;
+}

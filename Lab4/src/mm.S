@@ -9,3 +9,11 @@ memzero_fin:
 
 .global memcpy
 memcpy:
+    ldr x3, [x1], #8
+    str x3, [x0], #8
+    sub x2, x2, #8
+    cmp x2, #0
+    b.le memcpy_fin
+    b memcpy
+memcpy_fin:
+    ret
