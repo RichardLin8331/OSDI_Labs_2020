@@ -9,6 +9,7 @@ struct task_struct* task_pool[TASK_POOL_SIZE];
 void init_kernel_task() {
     struct task_struct* tmp = (struct task_struct*) TASK_BASE;
     memzero(TASK_BASE, (TASK_BASE + sizeof(struct task_struct)));
+    tmp->task_status = TASK_RUNNING;
     //tmp->pid = 0;
     task_pool[0] = tmp;
     asm volatile ("msr tpidr_el1, %0"::"r"(tmp));
@@ -78,11 +79,9 @@ int user_task_create() {
     tmp->context.lr = (unsigned long) return_from_fork;
     tmp->trapframe = (struct trapframe*) (tmp->context.sp_kernel);
     *(tmp->trapframe) = *(current->trapframe);
-    //tmp->trapframe->sp_user = us;
 
     // copy user stack 
     unsigned long cur_user_stack_offset = (current->trapframe->sp_user - USER_STACK_BASE) % PAGE_SIZE;
-    //unsigned long cur_user_stack_base = current->trapframe->sp_user - cur_user_stack_offset;
     tmp->trapframe->sp_user = us + cur_user_stack_offset;
     memcpy(tmp->trapframe->sp_user, current->trapframe->sp_user, cur_user_stack_offset);
 

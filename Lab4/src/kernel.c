@@ -21,8 +21,10 @@ void get_daif() {
 
 void idle () {
     while (1) {
-        schedule();
-        int cnt = 10000;
+        //schedule();
+        irq_enable();
+        uart_send_string("Return to kernel idle!!\r\n# ");
+        int cnt = 10000000000;
         while(cnt--);
     }
 }
@@ -167,21 +169,43 @@ void foo2(){
     }
 }
 
+void foo3(){
+    while(1) {
+        irq_enable();
+        get_daif();
+        uart_send_string("Task pid: ");
+        char pid_str[6];
+        itos(current->pid, pid_str);
+        uart_send_string(pid_str);
+        uart_send_string("\r\n# ");
+        get_daif();
+        //irq_disable();
+        uart_send_string("Goto shell... ...\r\n");
+        do_exec(shell_run);
+
+        int cnt = 10000000000;
+        while(cnt--);
+        //schedule();
+    }
+}
+
 
 
 void main () {
+    init_kernel_task();
     uart_init();
     uart_send_string("----- NYCU OSDI LAB 4 -----\r\n");
     
     char s0[] = "# Hello !!\r\n# Finish Booting !!\r\n"; 
     uart_send_string(s0);
     get_daif();
-
+    
     int N = 2;
     for(int i = 0; i < N; ++i) { // N should > 2
         privilege_task_create(foo);
         uart_send_string("Privilege task created\r\n");
     }
+    
     privilege_task_create(foo2);
     core_timer_enable();
     irq_enable();

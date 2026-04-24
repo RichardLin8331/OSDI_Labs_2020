@@ -5,7 +5,7 @@
 
 #define TASK_RUNNING 1
 #define TASK_WAITING 2
-#define TASK_EXIT 3;
+#define TASK_ZOMBIE 3;
 
 struct cpu_context{
     unsigned long x19;

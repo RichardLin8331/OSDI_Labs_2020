@@ -12,9 +12,10 @@ void schedule() {
     /*
         q_push(running_queue, current)
     */
+    core_timer_handler();
     if (queue_empty(running_queue_head, running_queue_tail) != 1) {
             struct task_struct* next = task_queue_pop(running_queue, &running_queue_head);
-            core_timer_handler();
+            
             context_switch(next);
         }
     
