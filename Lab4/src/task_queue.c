@@ -7,6 +7,9 @@ int running_queue_head = 0, running_queue_tail = 0;
 struct task_struct* waiting_queue[TASK_QUEUE_SIZE];
 int waiting_queue_head = 0, waiting_queue_tail = 0;
 
+struct task_struct* zombie_queue[TASK_QUEUE_SIZE];
+int zombie_queue_head = 0, zombie_queue_tail = 0;
+
 void task_queue_push(struct task_struct** t_queue, int* t_q_tail, struct task_struct *t) {
     t_queue[(*t_q_tail)++] = t;
     (*t_q_tail) %= TASK_QUEUE_SIZE;
@@ -23,4 +26,8 @@ struct task_struct* task_queue_pop(struct task_struct** t_queue, int* t_q_head) 
     struct task_struct* tmp = t_queue[(*t_q_head)++];
     (*t_q_head) %= TASK_QUEUE_SIZE;
     return tmp;
+}
+
+int num_runnable_tasks() {
+    return (running_queue_tail - running_queue_head + TASK_QUEUE_SIZE) % TASK_QUEUE_SIZE + 1;
 }

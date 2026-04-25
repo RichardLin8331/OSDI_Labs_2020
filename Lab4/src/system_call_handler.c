@@ -121,6 +121,11 @@ long system_call_handler() {
             return user_task_create();
         break;
 
+        case 9:
+            int status = (int) current->trapframe->regs[0];
+            task_exit(status);
+        break;
+
 
         case -1:
         

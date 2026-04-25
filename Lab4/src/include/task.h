@@ -5,7 +5,7 @@
 
 #define TASK_RUNNING 1
 #define TASK_WAITING 2
-#define TASK_ZOMBIE 3;
+#define TASK_ZOMBIE 3
 
 struct cpu_context{
     unsigned long x19;
@@ -46,5 +46,6 @@ void init_kernel_task();
 int privilege_task_create(void(*fn));
 int user_task_create();
 void do_exec(void* fn);
+void task_exit(int status);
 
 #endif

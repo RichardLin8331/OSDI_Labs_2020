@@ -68,7 +68,7 @@ int user_task_create() {
     unsigned long us = get_free_user_stack();
     if (pid == -1 || ks == -1 || us == -1) return -1;
     tmp = (struct task_struct*) TASK_BASE + pid * PAGE_SIZE;
-    memzero(tmp, tmp + sizeof(struct task_struct));
+    memzero((unsigned long) tmp, (unsigned long) tmp + sizeof(struct task_struct));
     tmp->pid = pid;
     tmp->context = current->context;
     
@@ -81,8 +81,8 @@ int user_task_create() {
     *(tmp->trapframe) = *(current->trapframe);
 
     // copy user stack 
-    unsigned long cur_user_stack_offset = (current->trapframe->sp_user - USER_STACK_BASE) % PAGE_SIZE;
-    tmp->trapframe->sp_user = us + cur_user_stack_offset;
+    unsigned long cur_user_stack_offset = PAGE_SIZE - (current->trapframe->sp_user - USER_STACK_BASE) % PAGE_SIZE;
+    tmp->trapframe->sp_user = us - cur_user_stack_offset;
     memcpy(tmp->trapframe->sp_user, current->trapframe->sp_user, cur_user_stack_offset);
 
 
@@ -96,7 +96,7 @@ int user_task_create() {
 }
 
 void do_exec(void* fn) {
-    memzero(current->trapframe, current->trapframe + sizeof(struct trapframe));
+    memzero((unsigned long) current->trapframe, (unsigned long) current->trapframe + sizeof(struct trapframe));
     current->trapframe->elr_el1 = (unsigned long) fn;
     current->trapframe->esr_el1 = 0x0;
     unsigned long sp_k = (unsigned long)current->trapframe;
@@ -113,3 +113,13 @@ void do_exec(void* fn) {
     return;
 }
 
+void task_exit(int status) {
+    free_user_stack(current->trapframe->sp_user);
+    current->task_status = TASK_ZOMBIE;
+    schedule();
+    /*
+        free(user_stack)
+        task->state = zombie
+        schedule()
+    */
+}

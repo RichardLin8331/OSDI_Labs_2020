@@ -52,3 +52,9 @@ int fork() {
     asm volatile ("mov %0, x0":"=r"(ret_ri));
     return ret_ri;
 }
+
+void exit(int status) {
+    asm volatile ("mov x0, %0"::"r"(status));
+    asm volatile ("mov x8, #9");
+    asm volatile ("svc #0");
+}
