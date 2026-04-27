@@ -7,6 +7,7 @@
 #include "include/irq_handler.h"
 #include "include/user_lib.h"
 #include "include/zombie_reaper.h"
+#include "include/core_timer.h"
 
 void get_daif() {
     unsigned long daif = 0;
@@ -207,13 +208,13 @@ void foo(){
     uart_send_string(pid_s);
     uart_send_string(" after exec, tmp address: ");
     char tmp_as[] ="0x00000000";
-    htos(&tmp, tmp_as);
+    htos((unsigned int) &tmp, tmp_as);
     uart_send_string(tmp_as);
     uart_send_string(", tmp value: ");
     char tmp_s[4];
     itos(tmp, tmp_s);
     uart_send_string(tmp_s);
-    uart_send_string("\r\n");
+    uart_send_string("\r\n# ");
 
 
     exit(0);
@@ -236,7 +237,7 @@ void test() {
             char cnt_s[4];
             itos(cnt, cnt_s);
             uart_send_string(cnt_s);
-            uart_send_string("\r\n");
+            uart_send_string("\r\n# ");
             
             delay(100000);
             ++cnt;
@@ -251,13 +252,13 @@ void test() {
         uart_send_string(pid_s);
         uart_send_string(" before exec, cnt address: ");
         char cnt_as[] ="0x00000000";
-        htos(&cnt, cnt_as);
+        htos((unsigned int) &cnt, cnt_as);
         uart_send_string(cnt_as);
         uart_send_string(", cnt value: ");
         char cnt_s[4];
         itos(cnt, cnt_s);
         uart_send_string(cnt_s);
-        uart_send_string("\r\n");
+        uart_send_string("\r\n# ");
 
         exec(foo);
     }
@@ -289,7 +290,7 @@ void main () {
     uart_init();
     uart_send_string("----- NYCU OSDI LAB 4 -----\r\n");
     
-    char s0[] = "# Hello !!\r\n# Finish Booting !!\r\n"; 
+    char s0[] = "# Hello !!\r\n# Finish Booting !!\r\n# "; 
     uart_send_string(s0);
     get_daif();
     /*

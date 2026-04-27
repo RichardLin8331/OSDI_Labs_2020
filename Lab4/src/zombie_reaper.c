@@ -15,10 +15,10 @@ void zombie_reaper() {
             free_task_mem(tmp->pid);
 
             uart_send_string("Reclaimed resources of pid: ");
-            int pid_str[4];
+            char pid_str[4];
             itos(tmp->pid, pid_str);
             uart_send_string(pid_str);
-            uart_send_string("\r\n");
+            uart_send_string("\r\n# ");
         }
     }
     

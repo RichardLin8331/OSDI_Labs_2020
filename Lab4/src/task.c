@@ -3,6 +3,7 @@
 #include "include/exception.h"
 #include "include/task_queue.h"
 #include "include/scheduler.h"
+#include "include/string.h"
 
 struct task_struct* task_pool[TASK_POOL_SIZE];
 

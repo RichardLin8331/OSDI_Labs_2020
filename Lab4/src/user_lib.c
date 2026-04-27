@@ -1,8 +1,11 @@
+#include "include/uart.h"
+
 int get_current_task_id() {
     int ret_ri = 0;
     asm volatile ("mov x8, #4");
     asm volatile ("svc #0");
     asm volatile ("mov %0, x0":"=r"(ret_ri));
+    return ret_ri;
 }
 
 int uart_write(char* buff, unsigned long buff_size) {

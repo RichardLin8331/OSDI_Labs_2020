@@ -113,7 +113,7 @@ long system_call_handler() {
 
         case 7:
             unsigned long fn = current->trapframe->regs[0];
-            do_exec(fn);
+            do_exec((void*) fn);
             return 0;
         break;
 
