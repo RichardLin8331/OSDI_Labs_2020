@@ -24,7 +24,7 @@
     + fork(), exec(), exit()
 
 ## References
-+ [RinHizakura/osdi2020](hhttps://github.com/RinHizakura/osdi2020)
++ [RinHizakura/osdi2020](https://github.com/RinHizakura/osdi2020)
 + [bztsrc/raspi3-tutorial](https://github.com/bztsrc/raspi3-tutorial)
 + [AArch64 Registers](https://developer.arm.com/documentation/ddi0601/2025-12/AArch64-Registers?lang=en)
 + [JingWangTW/NCTU-OSDI-2020](https://github.com/JingWangTW/NCTU-OSDI-2020)
