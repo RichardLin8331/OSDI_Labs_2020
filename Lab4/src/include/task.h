@@ -38,6 +38,7 @@ struct task_struct{
     unsigned long pid;
     unsigned short reschedule_flag;
     unsigned short task_status;
+    int priority;
 };
 
 extern struct task_struct* task_pool[TASK_POOL_SIZE];

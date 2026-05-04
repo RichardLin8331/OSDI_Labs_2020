@@ -215,8 +215,6 @@ void foo(){
     itos(tmp, tmp_s);
     uart_send_string(tmp_s);
     uart_send_string("\r\n# ");
-
-
     exit(0);
 }
 
@@ -275,13 +273,13 @@ void user_test(){
 void idle(){
   while(1){
     irq_enable();
-    if(num_runnable_tasks() == 2) {
+    if(num_runnable_tasks() == 1) {
       break;
     }
     schedule();
     delay(1000000);
   }
-  uart_send_string("Test finished\r\n");
+  uart_send_string("Test finished\r\n# ");
   while(1);
 }
 

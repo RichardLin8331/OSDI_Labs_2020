@@ -4,8 +4,17 @@
 #include "task.h"
 
 #define TASK_QUEUE_SIZE 100
-extern struct task_struct* running_queue[TASK_QUEUE_SIZE];
-extern int running_queue_head, running_queue_tail;
+
+struct priority_queue {
+    struct task_struct* pq[TASK_QUEUE_SIZE];
+    int size;
+};
+
+extern struct priority_queue running_queue;
+
+int num_runnable_tasks();
+void priority_queue_push(struct priority_queue* pq, struct task_struct* n);
+struct task_struct* priority_queue_pop(struct priority_queue* pq);
 
 extern struct task_struct* waiting_queue[TASK_QUEUE_SIZE];
 extern int waiting_queue_head, waiting_queue_tail;
