@@ -18,7 +18,8 @@
 
 ### Lab 4 Multitasking
 + Task Scheduler
-    + Running Queue, Waiting Queue
+    + Priority Based Running Queue
+    + FIFO Waiting Queue
     + Context Switching
 + System Calls 
     + fork(), exec(), exit()

@@ -53,9 +53,11 @@ int privilege_task_create(void* fn) {
     
     tmp->reschedule_flag = 0;
     tmp->task_status = TASK_RUNNING;
+    tmp->priority = 0;
+
     task_pool[pid] = tmp;
 
-    task_queue_push(running_queue, &running_queue_tail, tmp);
+    priority_queue_push(&running_queue, tmp);
     
 
     return pid;
@@ -90,9 +92,10 @@ int user_task_create() {
     tmp->context.x19 = 0;
     tmp->reschedule_flag = 0;
     tmp->task_status = TASK_RUNNING;
+    tmp->priority = 0;
     tmp->trapframe->regs[0] = 0;
     task_pool[pid] = tmp;
-    task_queue_push(running_queue, &running_queue_tail, tmp);
+    priority_queue_push(&running_queue, tmp);
     return pid;
 }
 
